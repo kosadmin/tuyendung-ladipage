@@ -48,6 +48,8 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Script from 'next/script';
+import dynamic from 'next/dynamic';
+const CTVModal = dynamic(() => import('@/components/CTVModal'), { ssr: false });
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Project {
@@ -138,7 +140,7 @@ function BannerCarousel({ fillHeight = false }: { fillHeight?: boolean }) {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
+const [ctvOpen, setCtvOpen] = useState(false);
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -298,7 +300,7 @@ function SearchFilterPanel({
 
   return (
     <div className={isSidebar
-      ? 'flex flex-col justify-center h-full px-8 py-8'
+      ? 'flex flex-col justify-center px-8 py-6'
       : 'px-4 py-7'}>
 
       {/* Title — only in sidebar */}
@@ -631,18 +633,15 @@ export default function HomePage() {
               PC HERO: Search panel (left, 40%) + Banner (right, 60%)
               Only visible on lg+ screens
           ════════════════════════════════════════════════════ */}
-<section aria-label="Tìm kiếm việc làm" className="hidden lg:flex group" style={{ aspectRatio: '2/1' }}>
+<section aria-label="Tìm kiếm việc làm" className="hidden lg:flex group items-stretch">
   {/* Search panel — LEFT 40% */}
-  <div
-    className="w-[40%] flex flex-col justify-center overflow-auto"
-    style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}
-  >
+  <div className="w-[40%] flex flex-col justify-center" style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}  >
     <SearchFilterPanel {...sharedPanelProps} variant="sidebar" />
   </div>
 
   {/* Banner — RIGHT 60%, height driven by parent aspect ratio */}
-  <div className="w-[60%] relative overflow-hidden bg-gray-900">
-    <BannerCarousel fillHeight />
+<div className="w-[60%]">  {/* không fillHeight nữa */}
+    <BannerCarousel />        {/* dùng aspect-[2/1] tự nhiên */}
   </div>
 </section>
 
@@ -780,21 +779,30 @@ export default function HomePage() {
                         {item}
                       </li>
                     ))}
-                  </ul>
-                  <button className="w-full sm:w-auto px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-orange-200 transition-all hover:shadow-xl active:scale-95">
+</ul>
+                  <button
+                    onClick={() => setCtvOpen(true)}
+                    className="w-full sm:w-auto px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-orange-200 transition-all hover:shadow-xl active:scale-95">
                     Đăng ký làm Cộng tác viên ngay →
                   </button>
                 </div>
-<div className="rounded-2xl overflow-hidden shadow-xl">
-  <img src="/banners/mobile-2.png" alt="Chương trình Cộng tác viên" className="w-full h-auto" />
+<div className="rounded-2xl overflow-hidden shadow-xl bg-orange-50">
+  <img
+    src="/banners/mobile-2.png"
+    alt="Chương trình Cộng tác viên"
+    className="w-full h-full object-cover"
+    style={{ aspectRatio: '3/2' }}
+  />
 </div>
               </div>
             </div>
           </section>
 {/* Tooltip nhắc click */}
-<div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 bg-orange-500 text-white text-[11px] font-bold px-3 py-2.5 rounded-xl shadow-xl leading-snug max-w-[130px] text-center pointer-events-none">
+<div className="fixed right-4 bottom-[33%] z-50 text-white text-[11px] font-bold px-3 py-2.5 rounded-xl shadow-xl leading-snug max-w-[130px] text-center pointer-events-none"
+  style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
   👆 Bấm vào công việc để xem chi tiết & ứng tuyển
 </div>
+          <CTVModal open={ctvOpen} onClose={() => setCtvOpen(false)} />
         </main>
 
         {/* ── FOOTER ── */}
