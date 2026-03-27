@@ -28,16 +28,16 @@
  * Tạo folder:  /public/banners/
  *
  * Banner PC (landscape) — khuyến nghị 1400×450px, tỉ lệ ~3:1
- *   /public/banners/pc-1.jpg
- *   /public/banners/pc-2.jpg
- *   /public/banners/pc-3.jpg
+ *   /public/banners/pc-1.png
+ *   /public/banners/pc-2.png
+ *   /public/banners/pc-3.png
  *
  * Banner Mobile (portrait/square) — khuyến nghị 750×500px, tỉ lệ 3:2
- *   /public/banners/mobile-1.jpg
- *   /public/banners/mobile-2.jpg
- *   /public/banners/mobile-3.jpg
+ *   /public/banners/mobile-1.png
+ *   /public/banners/mobile-2.png
+ *   /public/banners/mobile-3.png
  *
- * Format khuyến nghị: .jpg (quality ~85) hoặc .webp
+ * Format khuyến nghị: .png (quality ~85) hoặc .webp
  * Dung lượng: PC < 200KB, Mobile < 100KB mỗi ảnh
  * ─────────────────────────────────────────────────────────────
  */
@@ -80,9 +80,9 @@ const BANNER_INTERVAL = 5000; // 5 seconds
 
 // ── Banner config ──────────────────────────────────────────────────────────
 const BANNERS = [
-  { pc: '/banners/pc-1.jpg', mobile: '/banners/mobile-1.jpg', alt: 'Tuyển dụng công nhân – K-Outsourcing' },
-  { pc: '/banners/pc-2.jpg', mobile: '/banners/mobile-2.jpg', alt: 'Việc làm thu nhập cao – K-Outsourcing' },
-  { pc: '/banners/pc-3.jpg', mobile: '/banners/mobile-3.jpg', alt: 'Cơ hội nghề nghiệp tốt nhất – K-Outsourcing' },
+  { pc: '/banners/pc-1.png', mobile: '/banners/mobile-1.png', alt: 'Tuyển dụng công nhân – K-Outsourcing' },
+  { pc: '/banners/pc-2.png', mobile: '/banners/mobile-2.png', alt: 'Việc làm thu nhập cao – K-Outsourcing' },
+  { pc: '/banners/pc-3.png', mobile: '/banners/mobile-3.png', alt: 'Cơ hội nghề nghiệp tốt nhất – K-Outsourcing' },
 ];
 
 // ── Salary / Age config ────────────────────────────────────────────────────
