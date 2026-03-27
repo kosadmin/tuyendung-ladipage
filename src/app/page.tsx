@@ -1,7 +1,7 @@
 /**
  * ─────────────────────────────────────────────────────────────
  * SEO NOTE: Vì page này dùng 'use client', metadata phải khai báo
- * trong app/layout.tsx (hoặc route segment layout). Thêm đoạn này:
+ * trong app/layout.tsx. Thêm đoạn này:
  *
  * // app/layout.tsx (server component)
  * import type { Metadata } from 'next';
@@ -21,12 +21,30 @@
  *   twitter: { card: 'summary_large_image', title: 'Việc làm | K-Outsourcing' },
  *   robots: { index: true, follow: true },
  * };
+ *
+ * ─────────────────────────────────────────────────────────────
+ * HƯỚNG DẪN ĐẶT BANNER:
+ *
+ * Tạo folder:  /public/banners/
+ *
+ * Banner PC (landscape) — khuyến nghị 1400×450px, tỉ lệ ~3:1
+ *   /public/banners/pc-1.jpg
+ *   /public/banners/pc-2.jpg
+ *   /public/banners/pc-3.jpg
+ *
+ * Banner Mobile (portrait/square) — khuyến nghị 750×500px, tỉ lệ 3:2
+ *   /public/banners/mobile-1.jpg
+ *   /public/banners/mobile-2.jpg
+ *   /public/banners/mobile-3.jpg
+ *
+ * Format khuyến nghị: .jpg (quality ~85) hoặc .webp
+ * Dung lượng: PC < 200KB, Mobile < 100KB mỗi ảnh
  * ─────────────────────────────────────────────────────────────
  */
 
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -58,12 +76,21 @@ interface FilterState {
 
 const DEFAULT_FILTERS: FilterState = { cities: [], salaryRanges: [], ageMaxes: [] };
 const PAGE_SIZE = 12;
+const BANNER_INTERVAL = 5000; // 5 seconds
 
+// ── Banner config ──────────────────────────────────────────────────────────
+const BANNERS = [
+  { pc: '/banners/pc-1.jpg', mobile: '/banners/mobile-1.jpg', alt: 'Tuyển dụng công nhân – K-Outsourcing' },
+  { pc: '/banners/pc-2.jpg', mobile: '/banners/mobile-2.jpg', alt: 'Việc làm thu nhập cao – K-Outsourcing' },
+  { pc: '/banners/pc-3.jpg', mobile: '/banners/mobile-3.jpg', alt: 'Cơ hội nghề nghiệp tốt nhất – K-Outsourcing' },
+];
+
+// ── Salary / Age config ────────────────────────────────────────────────────
 const ALL_SALARY_RANGES = [
-  { key: '6-10',  label: '6–10 triệu',  min: 6,  max: 10   },
-  { key: '10-15', label: '10–15 triệu', min: 10, max: 15   },
-  { key: '15-20', label: '15–20 triệu', min: 15, max: 20   },
-  { key: '20-30', label: '20–30 triệu', min: 20, max: 30   },
+  { key: '6-10',  label: '6–10 triệu',    min: 6,  max: 10   },
+  { key: '10-15', label: '10–15 triệu',   min: 10, max: 15   },
+  { key: '15-20', label: '15–20 triệu',   min: 15, max: 20   },
+  { key: '20-30', label: '20–30 triệu',   min: 20, max: 30   },
   { key: '30+',   label: 'Trên 30 triệu', min: 30, max: null },
 ];
 
@@ -74,35 +101,119 @@ const AGE_OPTIONS = [
   { key: '60', label: 'Dưới 60', max: 60 },
 ];
 
+// ── Tag colors ─────────────────────────────────────────────────────────────
 const TAG_COLORS: Record<string, string> = {
-  'Tuyển gấp': 'bg-red-500 text-white',
-  'Hot': 'bg-rose-500 text-white',
-  'Ưu tiên': 'bg-orange-500 text-white',
-  'Mới': 'bg-blue-500 text-white',
+  'Tuyển gấp':  'bg-red-500 text-white',
+  'Hot':        'bg-rose-500 text-white',
+  'Ưu tiên':   'bg-orange-500 text-white',
+  'Mới':        'bg-blue-500 text-white',
   'Thưởng lớn': 'bg-amber-500 text-white',
-  'VIP': 'bg-purple-600 text-white',
+  'VIP':        'bg-purple-600 text-white',
 };
 const FALLBACK_COLORS = ['bg-teal-500 text-white','bg-cyan-600 text-white','bg-indigo-500 text-white','bg-pink-500 text-white'];
 const tagColor = (t: string) =>
-  TAG_COLORS[t] ?? FALLBACK_COLORS[t.split('').reduce((a,c)=>a+c.charCodeAt(0),0)%FALLBACK_COLORS.length];
+  TAG_COLORS[t] ?? FALLBACK_COLORS[t.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % FALLBACK_COLORS.length];
 
 function getRibbonTag(tags: string | null): string | null {
   if (!tags) return null;
-  const list = tags.split(',').map(t=>t.trim()).filter(Boolean);
+  const list = tags.split(',').map(t => t.trim()).filter(Boolean);
   if (list.includes('Tuyển gấp')) return 'Tuyển gấp';
-  return list.find(t=>TAG_COLORS[t]) ?? list[0] ?? null;
+  return list.find(t => TAG_COLORS[t]) ?? list[0] ?? null;
 }
 function tagPriority(tags: string | null): number {
   if (!tags) return 0;
-  if (tags.split(',').map(t=>t.trim()).includes('Tuyển gấp')) return 2;
+  if (tags.split(',').map(t => t.trim()).includes('Tuyển gấp')) return 2;
   return 1;
 }
 function formatSalary(min: number | null, max: number | null): string {
   if (!min && !max) return 'THU NHẬP: THỎA THUẬN';
-  const fmt = (n: number) => n >= 1000 ? `${(n/1000).toFixed(n%1000===0?0:1)} TỶ` : `${n}`;
+  const fmt = (n: number) => n >= 1000 ? `${(n/1000).toFixed(n % 1000 === 0 ? 0 : 1)} TỶ` : `${n}`;
   if (min && max) return `${fmt(min)} – ${fmt(max)} TRIỆU / THÁNG`;
   if (min) return `TỪ ${fmt(min)} TRIỆU / THÁNG`;
   return `ĐẾN ${fmt(max!)} TRIỆU / THÁNG`;
+}
+
+// ── Banner Carousel ────────────────────────────────────────────────────────
+function BannerCarousel({ variant }: { variant: 'pc' | 'mobile' }) {
+  const [idx, setIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setIdx(i => (i + 1) % BANNERS.length);
+    }, BANNER_INTERVAL);
+  }, []);
+
+  useEffect(() => {
+    if (!paused) startTimer();
+    else if (timerRef.current) clearInterval(timerRef.current);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [paused, startTimer]);
+
+  const goTo = (i: number) => { setIdx(i); startTimer(); };
+
+  const aspectClass = variant === 'pc'
+    ? 'w-full h-full'       // fills the flex container
+    : 'w-full aspect-[3/2]'; // 3:2 on mobile
+
+  return (
+    <div
+      className={`relative overflow-hidden ${variant === 'pc' ? 'h-full' : ''} bg-gray-200`}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-label="Banner tuyển dụng"
+    >
+      {/* Slides */}
+      {BANNERS.map((b, i) => (
+        <div
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-700 ${i === idx ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+          aria-hidden={i !== idx}
+        >
+          <img
+            src={variant === 'pc' ? b.pc : b.mobile}
+            alt={b.alt}
+            className={`${aspectClass} object-cover`}
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        </div>
+      ))}
+
+      {/* Dots */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+        {BANNERS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            aria-label={`Banner ${i + 1}`}
+            className={`rounded-full transition-all duration-300 ${i === idx ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/50 hover:bg-white/80'}`}
+          />
+        ))}
+      </div>
+
+      {/* Prev / Next arrows (PC only, shown on hover) */}
+      {variant === 'pc' && (
+        <>
+          <button
+            onClick={() => goTo((idx - 1 + BANNERS.length) % BANNERS.length)}
+            aria-label="Banner trước"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
+          >
+            ‹
+          </button>
+          <button
+            onClick={() => goTo((idx + 1) % BANNERS.length)}
+            aria-label="Banner tiếp theo"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
+          >
+            ›
+          </button>
+        </>
+      )}
+    </div>
+  );
 }
 
 // ── Multi-select Dropdown ──────────────────────────────────────────────────
@@ -166,6 +277,99 @@ function MultiDropdown({ label, options, selected, onToggle, onClear }: {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Search + Filter Panel (shared content) ─────────────────────────────────
+function SearchFilterPanel({
+  search, onSearchChange,
+  cities, availableSalaryRanges,
+  filters, activeCount,
+  onToggleCity, onToggleSalary, onToggleAge,
+  onResetFilters,
+  variant,
+}: {
+  search: string;
+  onSearchChange: (v: string) => void;
+  cities: string[];
+  availableSalaryRanges: typeof ALL_SALARY_RANGES;
+  filters: FilterState;
+  activeCount: number;
+  onToggleCity: (c: string) => void;
+  onToggleSalary: (k: string) => void;
+  onToggleAge: (k: string) => void;
+  onResetFilters: () => void;
+  variant: 'sidebar' | 'hero'; // sidebar = PC right panel, hero = mobile bottom
+}) {
+  const isSidebar = variant === 'sidebar';
+
+  return (
+    <div className={isSidebar
+      ? 'flex flex-col justify-center h-full px-8 py-8'
+      : 'px-4 py-7'}>
+
+      {/* Title — only in sidebar */}
+      {isSidebar && (
+        <div className="mb-6">
+          <h1 className="text-2xl font-black text-white leading-snug">
+            Khám phá công việc<br/>
+            <span className="text-amber-200">mơ ước của bạn</span>
+          </h1>
+          <p className="text-orange-100 text-xs mt-2">Hàng nghìn cơ hội đang chờ bạn</p>
+        </div>
+      )}
+
+      {/* Search */}
+      <div className={`flex items-center bg-white rounded-2xl shadow-lg mb-3 px-4 ${isSidebar ? '' : 'shadow-orange-900/20'}`}>
+        <svg className="w-4 h-4 text-gray-300 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="search"
+          placeholder="Tìm công việc, công ty..."
+          value={search}
+          onChange={e => onSearchChange(e.target.value)}
+          aria-label="Tìm kiếm việc làm"
+          className="flex-1 py-3 outline-none text-sm bg-transparent"
+        />
+        {search && (
+          <button onClick={() => onSearchChange('')} aria-label="Xóa tìm kiếm"
+            className="text-gray-300 hover:text-gray-500 transition ml-2 text-lg leading-none">×</button>
+        )}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-row flex-wrap gap-2 items-center">
+        {cities.length > 0 && (
+          <MultiDropdown label="Tỉnh thành"
+            options={cities.map(c => ({ key: c, label: c }))}
+            selected={filters.cities}
+            onToggle={onToggleCity}
+            onClear={() => { /* handled by resetFilters */ }}
+          />
+        )}
+        {availableSalaryRanges.length > 0 && (
+          <MultiDropdown label="Mức lương"
+            options={availableSalaryRanges.map(r => ({ key: r.key, label: r.label }))}
+            selected={filters.salaryRanges}
+            onToggle={onToggleSalary}
+            onClear={() => { /* handled by resetFilters */ }}
+          />
+        )}
+        <MultiDropdown label="Độ tuổi"
+          options={AGE_OPTIONS.map(o => ({ key: String(o.max), label: o.label }))}
+          selected={filters.ageMaxes.map(String)}
+          onToggle={onToggleAge}
+          onClear={() => { /* handled by resetFilters */ }}
+        />
+        {activeCount > 0 && (
+          <button onClick={onResetFilters}
+            className="flex-shrink-0 px-3 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition border border-white/30">
+            Xóa ({activeCount})
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -363,8 +567,8 @@ export default function HomePage() {
 
   useEffect(() => { setPage(1); }, [search, filters]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages  = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated   = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const activeCount = filters.cities.length + filters.salaryRanges.length + filters.ageMaxes.length;
 
   const toggleCity   = (city: string) => setFilters(prev => ({ ...prev, cities: prev.cities.includes(city) ? prev.cities.filter(c => c !== city) : [...prev.cities, city] }));
@@ -373,8 +577,19 @@ export default function HomePage() {
     const max = Number(key);
     setFilters(prev => ({ ...prev, ageMaxes: prev.ageMaxes.includes(max) ? prev.ageMaxes.filter(m => m !== max) : [...prev.ageMaxes, max] }));
   };
+  const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
-  // JSON-LD structured data for SEO
+  const sharedPanelProps = {
+    search, onSearchChange: setSearch,
+    cities, availableSalaryRanges,
+    filters, activeCount,
+    onToggleCity: toggleCity,
+    onToggleSalary: toggleSalary,
+    onToggleAge: toggleAge,
+    onResetFilters: resetFilters,
+  };
+
+  // JSON-LD
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -405,12 +620,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* JSON-LD structured data */}
-      <Script
-        id="json-ld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="min-h-screen bg-gray-50">
 
@@ -425,70 +635,37 @@ export default function HomePage() {
 
         <main id="main-content">
 
-          {/* ── HERO ── */}
-          <section aria-label="Tìm kiếm việc làm"
-            className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 pt-10 pb-10 px-4 sm:px-6">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-1">
-                Khám phá công việc
-              </h1>
-              <p className="text-3xl sm:text-4xl lg:text-5xl font-black text-amber-100 leading-tight mb-4">
-                mơ ước của bạn
-              </p>
-              <p className="text-orange-100 text-sm sm:text-base mb-8">
-                Hàng nghìn cơ hội việc làm đang chờ đón bạn mỗi ngày
-              </p>
+          {/* ════════════════════════════════════════════════════
+              PC HERO: Banner (left, 65%) + Search panel (right, 35%)
+              Only visible on lg+ screens
+          ════════════════════════════════════════════════════ */}
+          <section aria-label="Tìm kiếm việc làm" className="hidden lg:flex h-[420px] group">
+            {/* Banner — left 65% */}
+            <div className="flex-[65] relative overflow-hidden">
+              <BannerCarousel variant="pc" />
+            </div>
 
-              {/* Search — independent */}
-              <div className="bg-white rounded-2xl shadow-2xl shadow-orange-900/20 flex items-center px-4 py-1 mb-3">
-                <svg className="w-4 h-4 text-gray-300 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
-                <input
-                  type="search"
-                  placeholder="Tìm công việc, công ty, tỉnh thành..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  aria-label="Tìm kiếm việc làm"
-                  className="flex-1 py-3.5 outline-none text-sm bg-transparent"
-                />
-                {search && (
-                  <button onClick={() => setSearch('')} aria-label="Xóa tìm kiếm"
-                    className="text-gray-300 hover:text-gray-500 transition ml-2">✕</button>
-                )}
-              </div>
+            {/* Search panel — right 35%, orange gradient */}
+            <div className="flex-[35] bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 flex flex-col justify-center">
+              <SearchFilterPanel {...sharedPanelProps} variant="sidebar" />
+            </div>
+          </section>
 
-              {/* Filters — all on one row (flex-row, wrap nếu không đủ chỗ) */}
-              <div className="flex flex-row flex-wrap gap-2 items-center">
-                {cities.length > 0 && (
-                  <MultiDropdown label="Tỉnh thành"
-                    options={cities.map(c => ({ key: c, label: c }))}
-                    selected={filters.cities}
-                    onToggle={toggleCity}
-                    onClear={() => setFilters(prev => ({ ...prev, cities: [] }))}
-                  />
-                )}
-                {availableSalaryRanges.length > 0 && (
-                  <MultiDropdown label="Mức lương"
-                    options={availableSalaryRanges.map(r => ({ key: r.key, label: r.label }))}
-                    selected={filters.salaryRanges}
-                    onToggle={toggleSalary}
-                    onClear={() => setFilters(prev => ({ ...prev, salaryRanges: [] }))}
-                  />
-                )}
-                <MultiDropdown label="Độ tuổi"
-                  options={AGE_OPTIONS.map(o => ({ key: String(o.max), label: o.label }))}
-                  selected={filters.ageMaxes.map(String)}
-                  onToggle={toggleAge}
-                  onClear={() => setFilters(prev => ({ ...prev, ageMaxes: [] }))}
-                />
-                {activeCount > 0 && (
-                  <button onClick={() => setFilters(DEFAULT_FILTERS)}
-                    className="flex-shrink-0 px-3 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition border border-white/30">
-                    Xóa ({activeCount})
-                  </button>
-                )}
+          {/* ════════════════════════════════════════════════════
+              MOBILE / TABLET HERO: Banner on top, search below
+              Only visible below lg
+          ════════════════════════════════════════════════════ */}
+          <section aria-label="Tìm kiếm việc làm" className="lg:hidden">
+            {/* Mobile banner */}
+            <BannerCarousel variant="mobile" />
+
+            {/* Orange search section */}
+            <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400">
+              <div className="max-w-2xl mx-auto text-center px-4 pt-6 pb-2">
+                <h1 className="text-2xl font-black text-white leading-tight mb-1">Khám phá công việc</h1>
+                <p className="text-xl font-black text-amber-100 leading-tight mb-4">mơ ước của bạn</p>
               </div>
+              <SearchFilterPanel {...sharedPanelProps} variant="hero" />
             </div>
           </section>
 
@@ -530,12 +707,9 @@ export default function HomePage() {
           <section aria-label="Về K-Outsourcing" className="bg-white py-16 px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-                {/* Copy */}
                 <div>
                   <h2 className="text-3xl sm:text-4xl font-black text-orange-500 leading-tight mb-5">
-                    Việc làm trong tầm tay<br/>
-                    Thành công trong tầm với
+                    Việc làm trong tầm tay<br/>Thành công trong tầm với
                   </h2>
                   <p className="text-gray-500 leading-relaxed mb-6 text-[15px]">
                     K-Outsourcing kết nối ứng viên với hàng nghìn cơ hội việc làm phù hợp — nhanh chóng, minh bạch và hoàn toàn miễn phí. Dù bạn đang tìm việc hay muốn kiếm thêm thu nhập qua giới thiệu nhân sự, đây là nơi dành cho bạn.
@@ -558,45 +732,19 @@ export default function HomePage() {
                   </ul>
                 </div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    {
-                      value: '500k+', label: 'Hồ sơ trên hệ thống', accent: 'orange',
-                      icon: (
-                        <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                      ),
-                    },
-                    {
-                      value: '130k+', label: 'Lao động đã tuyển dụng', accent: 'none',
-                      icon: (
-                        <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                      ),
-                    },
-                    {
-                      value: '120+', label: 'Chuyên viên tuyển dụng', accent: 'none',
-                      icon: (
-                        <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                      ),
-                    },
-                    {
-                      value: '60+', label: 'Doanh nghiệp đồng hành', accent: 'yellow',
-                      icon: (
-                        <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                      ),
-                    },
+                    { value: '500k+', label: 'Hồ sơ trên hệ thống',     accent: 'orange',
+                      icon: <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> },
+                    { value: '130k+', label: 'Lao động đã tuyển dụng',   accent: 'none',
+                      icon: <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> },
+                    { value: '120+',  label: 'Chuyên viên tuyển dụng',   accent: 'none',
+                      icon: <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> },
+                    { value: '60+',   label: 'Doanh nghiệp đồng hành',   accent: 'yellow',
+                      icon: <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg> },
                   ].map((s, i) => (
-                    <div key={i}
-                      className={`rounded-2xl p-4 flex flex-col gap-2 shadow-sm transition-transform hover:-translate-y-1
-                        ${s.accent === 'orange' ? 'bg-orange-500' : s.accent === 'yellow' ? 'bg-yellow-400' : 'bg-gray-50 border border-gray-100'}`}>
+                    <div key={i} className={`rounded-2xl p-4 flex flex-col gap-2 shadow-sm transition-transform hover:-translate-y-1
+                      ${s.accent === 'orange' ? 'bg-orange-500' : s.accent === 'yellow' ? 'bg-yellow-400' : 'bg-gray-50 border border-gray-100'}`}>
                       <div aria-hidden="true">{s.icon}</div>
                       <p className={`text-3xl font-black leading-none ${s.accent !== 'none' ? 'text-white' : 'text-orange-500'}`}>{s.value}</p>
                       <p className={`text-xs font-semibold leading-snug ${s.accent === 'orange' ? 'text-orange-100' : s.accent === 'yellow' ? 'text-white' : 'text-orange-400'}`}>{s.label}</p>
@@ -608,19 +756,15 @@ export default function HomePage() {
           </section>
 
           {/* ── CTV SECTION ── */}
-          <section aria-label="Chương trình Cộng tác viên"
-            className="py-16 px-4 sm:px-6 bg-gradient-to-br from-orange-50 via-amber-50 to-white">
+          <section aria-label="Chương trình Cộng tác viên" className="py-16 px-4 sm:px-6 bg-gradient-to-br from-orange-50 via-amber-50 to-white">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-
-                {/* Copy */}
                 <div>
                   <span className="inline-block px-3 py-1 bg-orange-100 text-orange-600 text-[11px] font-black uppercase tracking-widest rounded-full mb-4">
                     Chương trình Cộng tác viên
                   </span>
                   <h2 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight mb-3">
-                    Giới thiệu việc làm<br/>
-                    Nhận hoa hồng hấp dẫn
+                    Giới thiệu việc làm<br/>Nhận hoa hồng hấp dẫn
                   </h2>
                   <p className="text-gray-500 text-[15px] leading-relaxed mb-6">
                     Bạn biết ai đang tìm việc? Hãy giới thiệu với chúng tôi. Chỉ cần một chiếc điện thoại là bạn có thể bắt đầu kiếm thu nhập ngay hôm nay.
@@ -645,8 +789,6 @@ export default function HomePage() {
                     Đăng ký làm Cộng tác viên ngay →
                   </button>
                 </div>
-
-                {/* Feature cards */}
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { icon: '💸', title: 'Hoa hồng hấp dẫn',  desc: 'Nhận thưởng ngay khi ứng viên được nhận việc thành công' },
@@ -670,11 +812,17 @@ export default function HomePage() {
         {/* ── FOOTER ── */}
         <footer role="contentinfo" className="bg-gray-100 border-t border-gray-200 pt-10 pb-8 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            {/* 3-col: col1 ~40%, col2+3 ~30% each on desktop; stacks on mobile */}
-            <div className="grid grid-cols-1 sm:grid-cols-[2fr_1.5fr_1.5fr] gap-8 lg:gap-10">
+            {/*
+              Layout:
+              - Mobile:  col1 full width → then col2+col3 side-by-side (2 cols)
+              - PC:      col1 (40%) | col2 hotline (30%) | col3 email+social (30%)
 
-              {/* Col 1 — Brand (wider) */}
-              <div className="sm:col-span-1">
+              Trick: outer grid = 2-col on mobile (col1 spans 2), 3-col on sm+
+            */}
+            <div className="grid grid-cols-2 sm:grid-cols-[2fr_1.5fr_1.5fr] gap-6 lg:gap-10">
+
+              {/* Col 1 — spans full width on mobile, 1 col on sm+ */}
+              <div className="col-span-2 sm:col-span-1">
                 <Link href="/" aria-label="K-Outsourcing – Trang chủ">
                   <img src="/logo.png" alt="K-Outsourcing" className="h-9 w-auto mb-4" width={140} height={36} />
                 </Link>
@@ -693,8 +841,8 @@ export default function HomePage() {
                 </address>
               </div>
 
-              {/* Col 2 — Hotline */}
-              <div>
+              {/* Col 2 — Hotline (col-span-1 on both mobile and sm+) */}
+              <div className="col-span-1">
                 <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3">Hotline tuyển dụng</p>
                 <div className="space-y-3">
                   {[
@@ -717,18 +865,17 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Col 3 — Email + Social */}
-              <div>
+              {/* Col 3 — Email + Social (col-span-1 on both mobile and sm+) */}
+              <div className="col-span-1">
                 <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3">Email</p>
-                <a href="mailto:info@koutsourcing.vn"
-                  className="flex items-center gap-2 group mb-5">
+                <a href="mailto:info@koutsourcing.vn" className="flex items-center gap-2 group mb-5">
                   <span className="w-7 h-7 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
                     <svg className="w-3 h-3 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                   </span>
                   <div>
-                    <p className="text-gray-800 font-black text-[13px] leading-none group-hover:text-orange-500 transition-colors">info@koutsourcing.vn</p>
+                    <p className="text-gray-800 font-black text-[13px] leading-none group-hover:text-orange-500 transition-colors break-all">info@koutsourcing.vn</p>
                     <p className="text-gray-400 text-[10px] mt-0.5">Phản hồi trong 24h</p>
                   </div>
                 </a>
@@ -760,6 +907,7 @@ export default function HomePage() {
             </div>
           </div>
         </footer>
+
       </div>
     </>
   );
