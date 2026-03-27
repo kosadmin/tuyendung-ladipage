@@ -28,16 +28,16 @@
  * Tạo folder:  /public/banners/
  *
  * Banner PC (landscape) — khuyến nghị 1400×450px, tỉ lệ ~3:1
- *   /public/banners/pc-1.png
- *   /public/banners/pc-2.png
- *   /public/banners/pc-3.png
+ *   /public/banners/pc-1.jpg
+ *   /public/banners/pc-2.jpg
+ *   /public/banners/pc-3.jpg
  *
  * Banner Mobile (portrait/square) — khuyến nghị 750×500px, tỉ lệ 3:2
- *   /public/banners/mobile-1.png
- *   /public/banners/mobile-2.png
- *   /public/banners/mobile-3.png
+ *   /public/banners/mobile-1.jpg
+ *   /public/banners/mobile-2.jpg
+ *   /public/banners/mobile-3.jpg
  *
- * Format khuyến nghị: .png (quality ~85) hoặc .webp
+ * Format khuyến nghị: .jpg (quality ~85) hoặc .webp
  * Dung lượng: PC < 200KB, Mobile < 100KB mỗi ảnh
  * ─────────────────────────────────────────────────────────────
  */
@@ -80,9 +80,9 @@ const BANNER_INTERVAL = 5000; // 5 seconds
 
 // ── Banner config ──────────────────────────────────────────────────────────
 const BANNERS = [
-  { pc: '/banners/pc-1.png', mobile: '/banners/mobile-1.png', alt: 'Tuyển dụng công nhân – K-Outsourcing' },
-  { pc: '/banners/pc-2.png', mobile: '/banners/mobile-2.png', alt: 'Việc làm thu nhập cao – K-Outsourcing' },
-  { pc: '/banners/pc-3.png', mobile: '/banners/mobile-3.png', alt: 'Cơ hội nghề nghiệp tốt nhất – K-Outsourcing' },
+  { src: '/banners/mobile-1.png', alt: 'Tuyển dụng công nhân – K-Outsourcing' },
+  { src: '/banners/mobile-2.png', alt: 'Việc làm thu nhập cao – K-Outsourcing' },
+  { src: '/banners/mobile-3.png', alt: 'Cơ hội nghề nghiệp tốt nhất – K-Outsourcing' },
 ];
 
 // ── Salary / Age config ────────────────────────────────────────────────────
@@ -134,7 +134,7 @@ function formatSalary(min: number | null, max: number | null): string {
 }
 
 // ── Banner Carousel ────────────────────────────────────────────────────────
-function BannerCarousel({ variant }: { variant: 'pc' | 'mobile' }) {
+function BannerCarousel({ fillHeight = false }: { fillHeight?: boolean }) {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -154,13 +154,9 @@ function BannerCarousel({ variant }: { variant: 'pc' | 'mobile' }) {
 
   const goTo = (i: number) => { setIdx(i); startTimer(); };
 
-  const aspectClass = variant === 'pc'
-    ? 'w-full h-full'       // fills the flex container
-    : 'w-full aspect-[3/2]'; // 3:2 on mobile
-
   return (
     <div
-      className={`relative overflow-hidden ${variant === 'pc' ? 'h-full' : ''} bg-gray-200`}
+      className={`relative overflow-hidden bg-gray-200 ${fillHeight ? 'h-full' : 'aspect-[3/2] w-full'}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Banner tuyển dụng"
@@ -173,9 +169,9 @@ function BannerCarousel({ variant }: { variant: 'pc' | 'mobile' }) {
           aria-hidden={i !== idx}
         >
           <img
-            src={variant === 'pc' ? b.pc : b.mobile}
+            src={b.src}
             alt={b.alt}
-            className={`${aspectClass} object-cover`}
+            className="w-full h-full object-cover"
             loading={i === 0 ? 'eager' : 'lazy'}
           />
         </div>
@@ -193,25 +189,21 @@ function BannerCarousel({ variant }: { variant: 'pc' | 'mobile' }) {
         ))}
       </div>
 
-      {/* Prev / Next arrows (PC only, shown on hover) */}
-      {variant === 'pc' && (
-        <>
-          <button
-            onClick={() => goTo((idx - 1 + BANNERS.length) % BANNERS.length)}
-            aria-label="Banner trước"
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => goTo((idx + 1) % BANNERS.length)}
-            aria-label="Banner tiếp theo"
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
-          >
-            ›
-          </button>
-        </>
-      )}
+      {/* Prev / Next arrows */}
+      <button
+        onClick={() => goTo((idx - 1 + BANNERS.length) % BANNERS.length)}
+        aria-label="Banner trước"
+        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
+      >
+        ‹
+      </button>
+      <button
+        onClick={() => goTo((idx + 1) % BANNERS.length)}
+        aria-label="Banner tiếp theo"
+        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition opacity-0 group-hover:opacity-100"
+      >
+        ›
+      </button>
     </div>
   );
 }
@@ -423,7 +415,7 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="px-5 pt-3 pb-3">
           <div className="flex items-center gap-2 bg-orange-50 rounded-xl px-3 py-2.5">
             <span aria-hidden="true">💰</span>
-            <span className="text-orange-700 font-black text-[11px] tracking-wide">
+            <span className="text-orange-700 font-black text-[13px] tracking-wide">
               {formatSalary(project.salary_min, project.salary_max)}
             </span>
           </div>
@@ -431,7 +423,7 @@ function ProjectCard({ project }: { project: Project }) {
         {project.highlight_info && (
           <div className="px-5 pb-4">
             <div className="px-3 py-1.5 bg-amber-50 border border-amber-100 rounded-lg">
-              <p className="text-amber-700 text-[10px] font-bold line-clamp-2">🎁 {project.highlight_info}</p>
+              <p className="text-amber-700 text-[12px] font-bold line-clamp-2">🎁 {project.highlight_info}</p>
             </div>
           </div>
         )}
@@ -636,36 +628,44 @@ export default function HomePage() {
         <main id="main-content">
 
           {/* ════════════════════════════════════════════════════
-              PC HERO: Banner (left, 65%) + Search panel (right, 35%)
+              PC HERO: Search panel (left, 40%) + Banner (right, 60%)
               Only visible on lg+ screens
           ════════════════════════════════════════════════════ */}
           <section aria-label="Tìm kiếm việc làm" className="hidden lg:flex h-[420px] group">
-            {/* Banner — left 65% */}
-            <div className="flex-[65] relative overflow-hidden">
-              <BannerCarousel variant="pc" />
+            {/* Search panel — LEFT 40%, orange gradient #ea6715 → #f36a13 */}
+            <div
+              className="flex-[40] flex flex-col justify-center"
+              style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}
+            >
+              <SearchFilterPanel {...sharedPanelProps} variant="sidebar" />
             </div>
 
-            {/* Search panel — right 35%, orange gradient */}
-            <div className="flex-[35] bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400 flex flex-col justify-center">
-              <SearchFilterPanel {...sharedPanelProps} variant="sidebar" />
+            {/* Banner — RIGHT 60% */}
+            <div className="flex-[60] relative overflow-hidden">
+              <BannerCarousel fillHeight />
             </div>
           </section>
 
           {/* ════════════════════════════════════════════════════
-              MOBILE / TABLET HERO: Banner on top, search below
+              MOBILE / TABLET HERO: Banner overlaps search section
               Only visible below lg
           ════════════════════════════════════════════════════ */}
-          <section aria-label="Tìm kiếm việc làm" className="lg:hidden">
-            {/* Mobile banner */}
-            <BannerCarousel variant="mobile" />
-
-            {/* Orange search section */}
-            <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-400">
-              <div className="max-w-2xl mx-auto text-center px-4 pt-6 pb-2">
+          <section aria-label="Tìm kiếm việc làm" className="lg:hidden relative">
+            {/* Orange search section with top padding to sit under banner */}
+            <div
+              className="pt-[190px]"
+              style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}
+            >
+              <div className="max-w-2xl mx-auto text-center px-4 pt-4 pb-2">
                 <h1 className="text-2xl font-black text-white leading-tight mb-1">Khám phá công việc</h1>
                 <p className="text-xl font-black text-amber-100 leading-tight mb-4">mơ ước của bạn</p>
               </div>
               <SearchFilterPanel {...sharedPanelProps} variant="hero" />
+            </div>
+
+            {/* Banner — absolute on top, overlapping the search section */}
+            <div className="absolute top-0 left-0 right-0 h-[210px] overflow-hidden z-10 shadow-lg">
+              <BannerCarousel />
             </div>
           </section>
 
@@ -843,7 +843,7 @@ export default function HomePage() {
 
               {/* Col 2 — Hotline (col-span-1 on both mobile and sm+) */}
               <div className="col-span-1">
-                <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3">Hotline tuyển dụng</p>
+                <p className="text-black font-black text-[10px] uppercase tracking-widest mb-3">Hotline tuyển dụng</p>
                 <div className="space-y-3">
                   {[
                     { number: '0325 277 292', label: 'Tư vấn miễn phí 24/7' },
@@ -851,8 +851,8 @@ export default function HomePage() {
                   ].map(phone => (
                     <a key={phone.number} href={`tel:${phone.number.replace(/\s/g, '')}`}
                       className="flex items-center gap-2 group">
-                      <span className="w-7 h-7 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
-                        <svg className="w-3 h-3 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <span className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-orange-600">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
                       </span>
@@ -867,10 +867,10 @@ export default function HomePage() {
 
               {/* Col 3 — Email + Social (col-span-1 on both mobile and sm+) */}
               <div className="col-span-1">
-                <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3">Email</p>
+                <p className="text-black font-black text-[10px] uppercase tracking-widest mb-3">Email</p>
                 <a href="mailto:info@koutsourcing.vn" className="flex items-center gap-2 group mb-5">
-                  <span className="w-7 h-7 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
-                    <svg className="w-3 h-3 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <span className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-orange-600">
+                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                   </span>
@@ -880,24 +880,29 @@ export default function HomePage() {
                   </div>
                 </a>
 
-                <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-2.5">Theo dõi chúng tôi</p>
+                <p className="text-black font-black text-[10px] uppercase tracking-widest mb-2.5">Theo dõi chúng tôi</p>
                 <div className="flex gap-2">
+                  {/* Facebook — brand blue #1877F2 */}
                   <a href="https://www.facebook.com/KOutsourcingVietNam" target="_blank" rel="noopener noreferrer"
                     aria-label="Facebook K-Outsourcing"
-                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 hover:bg-blue-600 hover:border-blue-600 flex items-center justify-center transition-all group">
-                    <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-85"
+                    style={{ backgroundColor: '#1877F2' }}>
+                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
                     </svg>
                   </a>
+                  {/* Zalo — brand blue #0068FF */}
                   <a href="https://zalo.me/koutsourcing" target="_blank" rel="noopener noreferrer"
                     aria-label="Zalo K-Outsourcing"
-                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 hover:bg-blue-500 hover:border-blue-500 flex items-center justify-center transition-all group">
-                    <span className="text-[9px] font-black text-gray-500 group-hover:text-white leading-none">Zalo</span>
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-85"
+                    style={{ backgroundColor: '#0068FF' }}>
+                    <span className="text-[9px] font-black text-white leading-none tracking-tight">Zalo</span>
                   </a>
+                  {/* TikTok — brand black */}
                   <a href="https://www.tiktok.com/@nhanluckos" target="_blank" rel="noopener noreferrer"
                     aria-label="TikTok K-Outsourcing"
-                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 hover:bg-gray-900 hover:border-gray-900 flex items-center justify-center transition-all group">
-                    <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    className="w-8 h-8 rounded-lg bg-black flex items-center justify-center transition-all hover:opacity-80">
+                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
                     </svg>
                   </a>
