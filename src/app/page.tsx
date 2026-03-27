@@ -631,37 +631,37 @@ export default function HomePage() {
               PC HERO: Search panel (left, 40%) + Banner (right, 60%)
               Only visible on lg+ screens
           ════════════════════════════════════════════════════ */}
-          <section aria-label="Tìm kiếm việc làm" className="hidden lg:flex group" style={{ aspectRatio: '2/1' }}>
-            {/* Search panel — LEFT 40%, orange gradient #ea6715 → #f36a13 */}
-            <div
-              className="flex-[40] flex flex-col justify-center"
-              style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}
-            >
-              <SearchFilterPanel {...sharedPanelProps} variant="sidebar" />
-            </div>
+<section aria-label="Tìm kiếm việc làm" className="hidden lg:flex group" style={{ aspectRatio: '2/1' }}>
+  {/* Search panel — LEFT 40% */}
+  <div
+    className="w-[40%] flex flex-col justify-center overflow-auto"
+    style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}
+  >
+    <SearchFilterPanel {...sharedPanelProps} variant="sidebar" />
+  </div>
 
-            {/* Banner — RIGHT 60% */}
-            <div className="flex-[60] relative overflow-hidden">
-              <BannerCarousel fillHeight />
-            </div>
-          </section>
+  {/* Banner — RIGHT 60%, height driven by parent aspect ratio */}
+  <div className="w-[60%] relative overflow-hidden bg-gray-900">
+    <BannerCarousel fillHeight />
+  </div>
+</section>
 
           {/* ════════════════════════════════════════════════════
               MOBILE / TABLET HERO: Banner overlaps search section
               Only visible below lg
           ════════════════════════════════════════════════════ */}
 <section aria-label="Tìm kiếm việc làm" className="lg:hidden">
+    {/* Search ngay bên dưới */}
+  <div style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}>
+    <div className="max-w-2xl mx-auto text-center px-4 pt-6 pb-2">
+      <h1 className="text-2xl font-black text-white leading-tight mb-1">KHÁM PHÁ CÔNG VIỆC</h1>
+      <p className="text-2xl font-black text-amber-100 leading-tight mb-4">MƠ ƯỚC CỦA BẠN</p>
+    </div>
+    <SearchFilterPanel {...sharedPanelProps} variant="hero" />
+  </div>
   {/* Banner bình thường, không absolute */}
   <div style={{ aspectRatio: '2/1' }} className="w-full overflow-hidden">
     <BannerCarousel />
-  </div>
-  {/* Search ngay bên dưới */}
-  <div style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}>
-    <div className="max-w-2xl mx-auto text-center px-4 pt-6 pb-2">
-      <h1 className="text-2xl font-black text-white leading-tight mb-1">Khám phá công việc</h1>
-      <p className="text-xl font-black text-amber-100 leading-tight mb-4">mơ ước của bạn</p>
-    </div>
-    <SearchFilterPanel {...sharedPanelProps} variant="hero" />
   </div>
 </section>
 
@@ -700,7 +700,7 @@ export default function HomePage() {
           </section>
 
           {/* ── ABOUT / STATS ── */}
-          <section aria-label="Về K-Outsourcing" className="bg-white py-16 px-4 sm:px-6">
+                 <section aria-label="Về K-Outsourcing" className="bg-white py-16 px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
@@ -728,9 +728,25 @@ export default function HomePage() {
                   </ul>
                 </div>
 
-<div className="rounded-2xl overflow-hidden shadow-xl">
-  <img src="/banners/mobile-2.png" alt="Chương trình Cộng tác viên" className="w-full h-auto" />
-</div>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { value: '500k+', label: 'Hồ sơ trên hệ thống',     accent: 'orange',
+                      icon: <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> },
+                    { value: '130k+', label: 'Lao động đã tuyển dụng',   accent: 'none',
+                      icon: <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> },
+                    { value: '120+',  label: 'Chuyên viên tuyển dụng',   accent: 'none',
+                      icon: <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> },
+                    { value: '60+',   label: 'Doanh nghiệp đồng hành',   accent: 'yellow',
+                      icon: <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg> },
+                  ].map((s, i) => (
+                    <div key={i} className={`rounded-2xl p-4 flex flex-col gap-2 shadow-sm transition-transform hover:-translate-y-1
+                      ${s.accent === 'orange' ? 'bg-orange-500' : s.accent === 'yellow' ? 'bg-yellow-400' : 'bg-gray-50 border border-gray-100'}`}>
+                      <div aria-hidden="true">{s.icon}</div>
+                      <p className={`text-3xl font-black leading-none ${s.accent !== 'none' ? 'text-white' : 'text-orange-500'}`}>{s.value}</p>
+                      <p className={`text-xs font-semibold leading-snug ${s.accent === 'orange' ? 'text-orange-100' : s.accent === 'yellow' ? 'text-white' : 'text-orange-400'}`}>{s.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
@@ -769,34 +785,16 @@ export default function HomePage() {
                     Đăng ký làm Cộng tác viên ngay →
                   </button>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { icon: '💸', title: 'Hoa hồng hấp dẫn',  desc: 'Nhận thưởng ngay khi ứng viên được nhận việc thành công' },
-                    { icon: '📱', title: 'Làm từ điện thoại',  desc: 'Không cần văn phòng, chỉ cần smartphone và mạng internet' },
-                    { icon: '🕐', title: 'Tự do thời gian',    desc: 'Sắp xếp lịch làm việc theo ý bạn, không giới hạn' },
-                    { icon: '🎓', title: 'Được đào tạo',       desc: 'Nhóm hỗ trợ luôn sẵn sàng hướng dẫn bạn từng bước' },
-                  ].map((card, i) => (
-                    <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-orange-100 transition-all">
-                      <span className="text-3xl block mb-3" aria-hidden="true">{card.icon}</span>
-                      <p className="font-bold text-gray-800 text-sm mb-1">{card.title}</p>
-                      <p className="text-gray-400 text-[11px] leading-relaxed">{card.desc}</p>
-                    </div>
-                  ))}
-                </div>
+<div className="rounded-2xl overflow-hidden shadow-xl">
+  <img src="/banners/mobile-2.png" alt="Chương trình Cộng tác viên" className="w-full h-auto" />
+</div>
               </div>
             </div>
           </section>
 {/* Tooltip nhắc click */}
-<div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2 group cursor-default">
-  {/* Label — ẩn mặc định, hiện khi hover */}
-  <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-gray-900 text-white text-[11px] font-bold px-3 py-2 rounded-l-xl shadow-lg max-w-[160px] text-right leading-snug">
-    Bấm vào công việc để xem chi tiết & ứng tuyển 👆
-  </div>
-  {/* Tab luôn hiện */}
-  <div className="bg-orange-500 text-white text-[10px] font-black px-2 py-6 rounded-l-xl shadow-lg writing-mode-vertical"
-    style={{ writingMode: 'vertical-rl', textOrientation: 'mixed', letterSpacing: '0.1em' }}>
-    XEM VIỆC LÀM
-  </div>
+<div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 bg-orange-500 text-white text-[11px] font-bold px-3 py-2.5 rounded-xl shadow-xl leading-snug max-w-[130px] text-center pointer-events-none">
+  👆 Bấm vào công việc để xem chi tiết & ứng tuyển
+</div>
 </div>
         </main>
 
