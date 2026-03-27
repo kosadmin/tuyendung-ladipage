@@ -564,7 +564,7 @@ export default function HomePage() {
                     {
                       value: '500k+', label: 'Hồ sơ trên hệ thống', accent: 'orange',
                       icon: (
-                        <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                       ),
@@ -572,7 +572,7 @@ export default function HomePage() {
                     {
                       value: '130k+', label: 'Lao động đã tuyển dụng', accent: 'none',
                       icon: (
-                        <svg className="w-7 h-7 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                       ),
@@ -580,7 +580,7 @@ export default function HomePage() {
                     {
                       value: '120+', label: 'Chuyên viên tuyển dụng', accent: 'none',
                       icon: (
-                        <svg className="w-7 h-7 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <svg className="w-9 h-9 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                       ),
@@ -588,7 +588,7 @@ export default function HomePage() {
                     {
                       value: '60+', label: 'Doanh nghiệp đồng hành', accent: 'yellow',
                       icon: (
-                        <svg className="w-7 h-7 text-amber-900/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                        <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                       ),
@@ -596,10 +596,10 @@ export default function HomePage() {
                   ].map((s, i) => (
                     <div key={i}
                       className={`rounded-2xl p-6 flex flex-col gap-3 shadow-sm transition-transform hover:-translate-y-1
-                        ${s.accent === 'orange' ? 'bg-orange-500' : s.accent === 'yellow' ? 'bg-amber-400' : 'bg-gray-50 border border-gray-100'}`}>
+                        ${s.accent === 'orange' ? 'bg-orange-500' : s.accent === 'yellow' ? 'bg-yellow-400' : 'bg-gray-50 border border-gray-100'}`}>
                       <div aria-hidden="true">{s.icon}</div>
-                      <p className={`text-4xl font-black leading-none ${s.accent !== 'none' ? 'text-white' : 'text-gray-900'}`}>{s.value}</p>
-                      <p className={`text-sm font-semibold leading-snug ${s.accent === 'orange' ? 'text-orange-100' : s.accent === 'yellow' ? 'text-amber-800' : 'text-gray-500'}`}>{s.label}</p>
+                      <p className={`text-4xl font-black leading-none ${s.accent !== 'none' ? 'text-white' : 'text-orange-500'}`}>{s.value}</p>
+                      <p className={`text-sm font-semibold leading-snug ${s.accent === 'orange' ? 'text-orange-100' : s.accent === 'yellow' ? 'text-white' : 'text-orange-400'}`}>{s.label}</p>
                     </div>
                   ))}
                 </div>
@@ -668,22 +668,23 @@ export default function HomePage() {
         </main>
 
         {/* ── FOOTER ── */}
-        <footer role="contentinfo" className="bg-orange-50 border-t border-orange-100 pt-12 pb-8 px-4 sm:px-6">
+        <footer role="contentinfo" className="bg-gray-100 border-t border-gray-200 pt-10 pb-8 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 mb-10">
+            {/* 3-col grid: col1 wider on desktop, col2 hotline, col3 email+social */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-10" style={{ gridTemplateColumns: 'auto 1fr 1fr' } as React.CSSProperties}>
 
-              {/* Col 1 — Brand */}
-              <div>
+              {/* Col 1 — Brand (wider) */}
+              <div className="sm:col-span-1">
                 <Link href="/" aria-label="K-Outsourcing – Trang chủ">
-                  <img src="/logo.png" alt="K-Outsourcing" className="h-9 w-auto mb-5" width={140} height={36} />
+                  <img src="/logo.png" alt="K-Outsourcing" className="h-9 w-auto mb-4" width={140} height={36} />
                 </Link>
-                <p className="text-gray-600 text-[14px] leading-relaxed mb-4">
-                  <strong className="text-gray-800 font-bold">Công ty Cổ phần Giải pháp nhân sự & Tư vấn đầu tư K-Outsourcing</strong>{' '}
-                  cung cấp dịch vụ cho thuê lại lao động và giải pháp nhân sự toàn diện cho doanh nghiệp.
+                <p className="text-gray-500 text-[13px] leading-relaxed mb-3">
+                  <strong className="text-gray-700 font-bold">Công ty Cổ phần Giải pháp nhân sự & Tư vấn đầu tư K-Outsourcing</strong>{' '}
+                  — cung cấp dịch vụ cho thuê lại lao động và giải pháp nhân sự toàn diện cho doanh nghiệp.
                 </p>
-                <address className="not-italic text-[14px] text-gray-600 leading-relaxed">
-                  <span className="inline-flex items-start gap-2">
-                    <svg className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <address className="not-italic">
+                  <span className="inline-flex items-start gap-1.5 text-[13px] text-gray-500 leading-relaxed">
+                    <svg className="w-3.5 h-3.5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
@@ -692,81 +693,70 @@ export default function HomePage() {
                 </address>
               </div>
 
-              {/* Col 2 — Contact */}
+              {/* Col 2 — Hotline */}
               <div>
-                {/* Hotline */}
-                <p className="text-orange-500 font-black text-[11px] uppercase tracking-widest mb-3">Hotline tuyển dụng</p>
-                <div className="space-y-2.5 mb-6">
+                <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3">Hotline tuyển dụng</p>
+                <div className="space-y-3">
                   {[
                     { number: '0325 277 292', label: 'Tư vấn miễn phí 24/7' },
                     { number: '0397 013 122', label: 'Hỗ trợ ứng viên' },
                   ].map(phone => (
                     <a key={phone.number} href={`tel:${phone.number.replace(/\s/g, '')}`}
-                      className="flex items-center gap-2.5 group">
-                      <span className="w-8 h-8 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
-                        <svg className="w-3.5 h-3.5 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      className="flex items-center gap-2 group">
+                      <span className="w-7 h-7 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
+                        <svg className="w-3 h-3 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                         </svg>
                       </span>
                       <div>
-                        <p className="text-gray-900 font-black text-[15px] leading-none group-hover:text-orange-500 transition-colors">{phone.number}</p>
+                        <p className="text-gray-800 font-black text-[13px] leading-none group-hover:text-orange-500 transition-colors">{phone.number}</p>
                         <p className="text-gray-400 text-[10px] mt-0.5">{phone.label}</p>
                       </div>
                     </a>
                   ))}
                 </div>
+              </div>
 
-                {/* Email */}
-                <p className="text-orange-500 font-black text-[11px] uppercase tracking-widest mb-3">Email</p>
+              {/* Col 3 — Email + Social */}
+              <div>
+                <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-3">Email</p>
                 <a href="mailto:info@koutsourcing.vn"
-                  className="flex items-center gap-2.5 group mb-6">
-                  <span className="w-8 h-8 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  className="flex items-center gap-2 group mb-5">
+                  <span className="w-7 h-7 rounded-lg bg-orange-100 group-hover:bg-orange-500 flex items-center justify-center transition-all flex-shrink-0">
+                    <svg className="w-3 h-3 text-orange-500 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
                   </span>
                   <div>
-                    <p className="text-gray-900 font-black text-[15px] leading-none group-hover:text-orange-500 transition-colors">info@koutsourcing.vn</p>
+                    <p className="text-gray-800 font-black text-[13px] leading-none group-hover:text-orange-500 transition-colors">info@koutsourcing.vn</p>
                     <p className="text-gray-400 text-[10px] mt-0.5">Phản hồi trong 24h</p>
                   </div>
                 </a>
 
-                {/* Social */}
-                <p className="text-orange-500 font-black text-[11px] uppercase tracking-widest mb-3">Theo dõi chúng tôi</p>
+                <p className="text-orange-500 font-black text-[10px] uppercase tracking-widest mb-2.5">Theo dõi chúng tôi</p>
                 <div className="flex gap-2">
-                  {/* Facebook */}
                   <a href="https://www.facebook.com/KOutsourcingVietNam" target="_blank" rel="noopener noreferrer"
                     aria-label="Facebook K-Outsourcing"
-                    className="w-9 h-9 rounded-xl bg-white border border-gray-200 hover:bg-blue-600 hover:border-blue-600 flex items-center justify-center transition-all group">
-                    <svg className="w-4 h-4 text-gray-500 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 hover:bg-blue-600 hover:border-blue-600 flex items-center justify-center transition-all group">
+                    <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
                     </svg>
                   </a>
-                  {/* Zalo */}
                   <a href="https://zalo.me/koutsourcing" target="_blank" rel="noopener noreferrer"
                     aria-label="Zalo K-Outsourcing"
-                    className="w-9 h-9 rounded-xl bg-white border border-gray-200 hover:bg-blue-500 hover:border-blue-500 flex items-center justify-center transition-all group">
-                    <span className="text-[10px] font-black text-gray-500 group-hover:text-white leading-none">Zalo</span>
+                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 hover:bg-blue-500 hover:border-blue-500 flex items-center justify-center transition-all group">
+                    <span className="text-[9px] font-black text-gray-500 group-hover:text-white leading-none">Zalo</span>
                   </a>
-                  {/* TikTok */}
                   <a href="https://www.tiktok.com/@nhanluckos" target="_blank" rel="noopener noreferrer"
                     aria-label="TikTok K-Outsourcing"
-                    className="w-9 h-9 rounded-xl bg-white border border-gray-200 hover:bg-gray-900 hover:border-gray-900 flex items-center justify-center transition-all group">
-                    <svg className="w-4 h-4 text-gray-500 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    className="w-8 h-8 rounded-lg bg-white border border-gray-200 hover:bg-gray-900 hover:border-gray-900 flex items-center justify-center transition-all group">
+                    <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
                     </svg>
                   </a>
                 </div>
               </div>
-            </div>
 
-            <div className="border-t border-orange-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-[11px] text-gray-400">
-                © {new Date().getFullYear()} K-Outsourcing. Tất cả quyền được bảo lưu.
-              </p>
-              <p className="text-[11px] text-gray-400">
-                Sở KHĐT TP Hà Nội cấp phép
-              </p>
             </div>
           </div>
         </footer>
