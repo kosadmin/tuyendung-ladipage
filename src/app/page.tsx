@@ -140,7 +140,7 @@ function BannerCarousel({ fillHeight = false }: { fillHeight?: boolean }) {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-const [ctvOpen, setCtvOpen] = useState(false);
+
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -499,6 +499,7 @@ export default function HomePage() {
   const [search, setSearch]     = useState('');
   const [filters, setFilters]   = useState<FilterState>(DEFAULT_FILTERS);
   const [page, setPage]         = useState(1);
+  const [ctvOpen, setCtvOpen]   = useState(false);
 
   useEffect(() => {
     (async () => {
