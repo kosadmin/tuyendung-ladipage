@@ -595,11 +595,11 @@ export default function HomePage() {
                     },
                   ].map((s, i) => (
                     <div key={i}
-                      className={`rounded-2xl p-6 flex flex-col gap-3 shadow-sm transition-transform hover:-translate-y-1
+                      className={`rounded-2xl p-4 flex flex-col gap-2 shadow-sm transition-transform hover:-translate-y-1
                         ${s.accent === 'orange' ? 'bg-orange-500' : s.accent === 'yellow' ? 'bg-yellow-400' : 'bg-gray-50 border border-gray-100'}`}>
                       <div aria-hidden="true">{s.icon}</div>
-                      <p className={`text-4xl font-black leading-none ${s.accent !== 'none' ? 'text-white' : 'text-orange-500'}`}>{s.value}</p>
-                      <p className={`text-sm font-semibold leading-snug ${s.accent === 'orange' ? 'text-orange-100' : s.accent === 'yellow' ? 'text-white' : 'text-orange-400'}`}>{s.label}</p>
+                      <p className={`text-3xl font-black leading-none ${s.accent !== 'none' ? 'text-white' : 'text-orange-500'}`}>{s.value}</p>
+                      <p className={`text-xs font-semibold leading-snug ${s.accent === 'orange' ? 'text-orange-100' : s.accent === 'yellow' ? 'text-white' : 'text-orange-400'}`}>{s.label}</p>
                     </div>
                   ))}
                 </div>
@@ -670,8 +670,8 @@ export default function HomePage() {
         {/* ── FOOTER ── */}
         <footer role="contentinfo" className="bg-gray-100 border-t border-gray-200 pt-10 pb-8 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
-            {/* 3-col grid: col1 wider on desktop, col2 hotline, col3 email+social */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-10" style={{ gridTemplateColumns: 'auto 1fr 1fr' } as React.CSSProperties}>
+            {/* 3-col: col1 ~40%, col2+3 ~30% each on desktop; stacks on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-[2fr_1.5fr_1.5fr] gap-8 lg:gap-10">
 
               {/* Col 1 — Brand (wider) */}
               <div className="sm:col-span-1">
