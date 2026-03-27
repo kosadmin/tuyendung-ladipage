@@ -795,7 +795,6 @@ export default function HomePage() {
 <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 bg-orange-500 text-white text-[11px] font-bold px-3 py-2.5 rounded-xl shadow-xl leading-snug max-w-[130px] text-center pointer-events-none">
   👆 Bấm vào công việc để xem chi tiết & ứng tuyển
 </div>
-</div>
         </main>
 
         {/* ── FOOTER ── */}
