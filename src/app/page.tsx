@@ -36,6 +36,8 @@ const DEFAULT_FILTERS: FilterState = {
   sortBy: 'newest',
 };
 
+const PAGE_SIZE = 12;
+
 // ── Config ─────────────────────────────────────────────────────────────────
 const statusConfig: Record<string, { color: string; dot: string }> = {
   'Đang tuyển': { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
@@ -114,54 +116,6 @@ function SalaryRange({ salaryMin, salaryMax, setSalaryMin, setSalaryMax, small }
         <span className="text-gray-300 text-xs flex-shrink-0">—</span>
         <input type="number" min="0" placeholder="Đến" value={salaryMax} onChange={e => setSalaryMax(e.target.value)} className={inp} />
       </div>
-    </div>
-  );
-}
-
-// ── PC Sidebar ─────────────────────────────────────────────────────────────
-function FilterSidebar({ show, filters, setFilters, cities }: {
-  show: boolean;
-  filters: FilterState; setFilters: (f: FilterState) => void;
-  cities: string[];
-}) {
-  const set = (patch: Partial<FilterState>) => setFilters({ ...filters, ...patch });
-  const reset = () => setFilters(DEFAULT_FILTERS);
-
-  return (
-    <div className={`hidden sm:flex flex-col flex-shrink-0 bg-white rounded-xl shadow-sm border transition-all duration-300 overflow-hidden ${show ? 'w-56' : 'w-0 border-0'}`}>
-      {show && (
-        <>
-          <div className="p-3 border-b bg-orange-600 flex items-center justify-between flex-shrink-0">
-            <span className="text-white font-black text-[10px] uppercase tracking-widest">Bộ lọc</span>
-            <button onClick={reset} className="text-[9px] font-bold text-orange-200 hover:text-white underline">Xóa tất cả</button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-4">
-            <div>
-              <p className="text-[10px] uppercase font-black text-gray-400 mb-1.5 tracking-widest">Sắp xếp</p>
-              <div className="space-y-1">
-                {([['newest','Mới nhất'],['oldest','Cũ nhất']] as const).map(([val, lbl]) => (
-                  <label key={val} className={`flex items-center gap-2 px-2 py-1 rounded-lg cursor-pointer text-[11px] transition ${filters.sortBy === val ? 'bg-orange-50 text-orange-700 font-bold' : 'text-gray-600 hover:bg-gray-50'}`}>
-                    <input type="radio" checked={filters.sortBy === val} onChange={() => set({ sortBy: val })} className="w-3 h-3 accent-orange-500" />
-                    {lbl}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <MultiCheck label="Trạng thái" options={Object.keys(statusConfig)}
-              selected={filters.statuses} onChange={v => set({ statuses: v })} />
-
-            {cities.length > 0 && (
-              <MultiCheck label="Tỉnh / Thành phố" options={cities}
-                selected={filters.cities} onChange={v => set({ cities: v })} />
-            )}
-
-            <SalaryRange small
-              salaryMin={filters.salaryMin} salaryMax={filters.salaryMax}
-              setSalaryMin={v => set({ salaryMin: v })} setSalaryMax={v => set({ salaryMax: v })} />
-          </div>
-        </>
-      )}
     </div>
   );
 }
@@ -261,8 +215,8 @@ function FilterPopup({ open, onClose, onApply, initial, cities }: {
 
 // ── Project Card ───────────────────────────────────────────────────────────
 function ProjectCard({ project }: { project: Project }) {
-  const status   = statusConfig[project.status] ?? statusConfig['Đang tuyển'];
-  const ribbon   = getRibbonTag(project.tags);
+  const status    = statusConfig[project.status] ?? statusConfig['Đang tuyển'];
+  const ribbon    = getRibbonTag(project.tags);
   const positions = project.position?.split(',').map(p => p.trim()).filter(Boolean) ?? [];
 
   return (
@@ -350,15 +304,53 @@ function SkeletonCard() {
   );
 }
 
+// ── Pagination ─────────────────────────────────────────────────────────────
+function Pagination({ page, totalPages, setPage }: {
+  page: number; totalPages: number; setPage: (p: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+    .filter(n => n === 1 || n === totalPages || Math.abs(n - page) <= 1)
+    .reduce<(number | '...')[]>((acc, n, i, arr) => {
+      if (i > 0 && n - (arr[i - 1] as number) > 1) acc.push('...');
+      acc.push(n);
+      return acc;
+    }, []);
+
+  return (
+    <div className="flex items-center justify-center gap-2 mt-6 pb-4">
+      <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
+        className="px-3 py-1.5 rounded-lg border text-sm font-bold text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition">
+        ← Trước
+      </button>
+      {pages.map((n, i) => n === '...'
+        ? <span key={`dot-${i}`} className="px-1 text-gray-300">…</span>
+        : (
+          <button key={n} onClick={() => setPage(n as number)}
+            className={`w-8 h-8 rounded-lg text-sm font-bold transition ${page === n ? 'bg-orange-500 text-white' : 'border text-gray-500 hover:bg-gray-50'}`}>
+            {n}
+          </button>
+        )
+      )}
+      <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages}
+        className="px-3 py-1.5 rounded-lg border text-sm font-bold text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition">
+        Sau →
+      </button>
+    </div>
+  );
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState<string | null>(null);
-  const [search, setSearch]     = useState('');
-  const [filters, setFilters]   = useState<FilterState>(DEFAULT_FILTERS);
+  const [projects, setProjects]       = useState<Project[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState<string | null>(null);
+  const [search, setSearch]           = useState('');
+  const [filters, setFilters]         = useState<FilterState>(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
   const [showPopup, setShowPopup]     = useState(false);
+  const [page, setPage]               = useState(1);
 
   useEffect(() => {
     (async () => {
@@ -367,7 +359,7 @@ export default function HomePage() {
         const { data, error: e } = await supabase
           .from('projects')
           .select('id,project_id,project,project_type,company,address_city,position,salary_min,salary_max,status,highlight_info,icon_job,tags,hiring_form')
-          .eq('privacy', 'public')           // chỉ lấy dự án public
+          .eq('privacy', 'Công khai')
           .order('created_at', { ascending: false });
         if (e) throw e;
         setProjects(data || []);
@@ -376,7 +368,9 @@ export default function HomePage() {
     })();
   }, []);
 
-  const cities = useMemo(() => Array.from(new Set(projects.map(p => p.address_city).filter(Boolean))).sort(), [projects]);
+  const cities = useMemo(() =>
+    Array.from(new Set(projects.map(p => p.address_city).filter(Boolean))).sort()
+  , [projects]);
 
   const filtered = useMemo(() => {
     let r = [...projects];
@@ -393,12 +387,15 @@ export default function HomePage() {
     if (filters.cities.length > 0)   r = r.filter(p => filters.cities.includes(p.address_city));
     if (filters.salaryMin)            r = r.filter(p => p.salary_max != null && p.salary_max >= Number(filters.salaryMin));
     if (filters.salaryMax)            r = r.filter(p => p.salary_min != null && p.salary_min <= Number(filters.salaryMax));
-
     r.sort((a, b) => tagPriority(b.tags) - tagPriority(a.tags));
     if (filters.sortBy === 'oldest') r.reverse();
     return r;
   }, [projects, search, filters]);
 
+  useEffect(() => { setPage(1); }, [search, filters]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const activeCount = filters.statuses.length + filters.cities.length
     + (filters.salaryMin ? 1 : 0) + (filters.salaryMax ? 1 : 0);
 
@@ -408,10 +405,10 @@ export default function HomePage() {
       {/* HEADER */}
       <div className="fixed top-0 left-0 right-0 z-40 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-          {/* Logo / Brand */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-xl">🏭</span>
-            <span className="font-black text-orange-600 text-base tracking-tight hidden sm:inline">Tuyển Dụng</span>
+
+          {/* Logo */}
+          <div className="flex items-center flex-shrink-0">
+            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
           </div>
 
           {/* Search */}
@@ -444,7 +441,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* BODY (below fixed header) */}
+      {/* BODY */}
       <div className="flex w-full pt-[57px] h-full overflow-hidden">
 
         {/* PC SIDEBAR */}
@@ -520,9 +517,13 @@ export default function HomePage() {
             {/* Grid */}
             {!loading && !error && filtered.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {filtered.map(p => <ProjectCard key={p.id} project={p} />)}
+                {paginated.map(p => <ProjectCard key={p.id} project={p} />)}
               </div>
             )}
+
+            {/* Pagination */}
+            <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+
           </div>
         </div>
       </div>
