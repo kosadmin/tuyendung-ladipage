@@ -193,7 +193,7 @@ export default function ApplyModal({
   projectId, projectName, projectType,
   addressCity,
 }: ApplyModalProps) {
-  const ENDPOINT = process.env.NEXT_PUBLIC_APPLY_SHEET_ENDPOINT ?? '';
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwq42flDX4bdiMmMdNwW44YOUi4cAsVpvsW3W50jjHAiCkssonOir1eTZedoknUXHhB/exec';
 
   const [form, setForm] = useState<FormData>({
     full_name: '',
