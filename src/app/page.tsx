@@ -302,16 +302,15 @@ function SearchFilterPanel({
   return (
     <div className={isSidebar
       ? 'flex flex-col justify-center px-8 py-6'
-      : 'px-4 py-7'}>
+      : 'px-4 pt-2 pb-6'}>
 
       {/* Title — only in sidebar */}
       {isSidebar && (
         <div className="mb-6">
           <h1 className="text-2xl font-black text-white leading-snug">
-            Khám phá công việc<br/>
-            <span className="text-amber-200">mơ ước của bạn</span>
+            KHÁM PHÁ CÔNG VIỆC<br/>
+            <span className="text-amber-200">MƠ ƯỚC CỦA BẠN</span>
           </h1>
-          <p className="text-orange-100 text-xs mt-2">Hàng nghìn cơ hội đang chờ bạn</p>
         </div>
       )}
 
@@ -660,7 +659,6 @@ const toggleAge = (key: string) => {
     <div className="max-w-2xl mx-auto text-center px-4 pt-6 pb-2">
       <h1 className="text-2xl font-black text-white leading-tight mb-1">KHÁM PHÁ CÔNG VIỆC</h1>
       <p className="text-2xl font-black text-amber-100 leading-tight mb-4">MƠ ƯỚC CỦA BẠN</p>
-      <p className="text-orange-100 text-xs mb-4">Hàng nghìn cơ hội đang chờ bạn</p>
     </div>
     <SearchFilterPanel {...sharedPanelProps} variant="hero" />
   </div>
