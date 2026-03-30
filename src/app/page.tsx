@@ -50,6 +50,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import dynamic from 'next/dynamic';
 const CTVModal = dynamic(() => import('@/components/CTVModal'), { ssr: false });
+import SiteLayout from '@/components/SiteLayout';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Project {
@@ -73,10 +74,10 @@ interface Project {
 interface FilterState {
   cities: string[];
   salaryRanges: string[];
-  ageMaxes: number[];
+  ageRanges: string[];
 }
 
-const DEFAULT_FILTERS: FilterState = { cities: [], salaryRanges: [], ageMaxes: [] };
+const DEFAULT_FILTERS: FilterState = { cities: [], salaryRanges: [], ageRanges: [] };
 const PAGE_SIZE = 12;
 const BANNER_INTERVAL = 5000; // 5 seconds
 
@@ -96,11 +97,11 @@ const ALL_SALARY_RANGES = [
   { key: '30+',   label: 'Trên 30 triệu', min: 30, max: null },
 ];
 
-const AGE_OPTIONS = [
-  { key: '30', label: 'Dưới 30', max: 30 },
-  { key: '40', label: 'Dưới 40', max: 40 },
-  { key: '50', label: 'Dưới 50', max: 50 },
-  { key: '60', label: 'Dưới 60', max: 60 },
+const AGE_RANGES = [
+  { key: '18-30', label: '18–30 tuổi', min: 18, max: 30 },
+  { key: '30-40', label: '30–40 tuổi', min: 30, max: 40 },
+  { key: '40-50', label: '40–50 tuổi', min: 40, max: 50 },
+  { key: '50-60', label: '50–60 tuổi', min: 50, max: 60 },
 ];
 
 // ── Tag colors ─────────────────────────────────────────────────────────────
@@ -333,37 +334,40 @@ function SearchFilterPanel({
         )}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-row flex-wrap gap-2 items-center">
-        {cities.length > 0 && (
-          <MultiDropdown label="Tỉnh thành"
-            options={cities.map(c => ({ key: c, label: c }))}
-            selected={filters.cities}
-            onToggle={onToggleCity}
-            onClear={() => { /* handled by resetFilters */ }}
-          />
-        )}
-        {availableSalaryRanges.length > 0 && (
-          <MultiDropdown label="Mức lương"
-            options={availableSalaryRanges.map(r => ({ key: r.key, label: r.label }))}
-            selected={filters.salaryRanges}
-            onToggle={onToggleSalary}
-            onClear={() => { /* handled by resetFilters */ }}
-          />
-        )}
-        <MultiDropdown label="Độ tuổi"
-          options={AGE_OPTIONS.map(o => ({ key: String(o.max), label: o.label }))}
-          selected={filters.ageMaxes.map(String)}
-          onToggle={onToggleAge}
-          onClear={() => { /* handled by resetFilters */ }}
-        />
-        {activeCount > 0 && (
-          <button onClick={onResetFilters}
-            className="flex-shrink-0 px-3 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition border border-white/30">
-            Xóa ({activeCount})
-          </button>
-        )}
-      </div>
+ {/* Filters */}
+<div className="flex flex-row flex-wrap gap-2 items-center">
+  {cities.length > 0 && (
+    <MultiDropdown
+      label="Tỉnh thành"
+      options={cities.map(c => ({ key: c, label: c }))}
+      selected={filters.cities}
+      onToggle={onToggleCity}
+      onClear={() => {}}
+    />
+  )}
+  {availableSalaryRanges.length > 0 && (
+    <MultiDropdown
+      label="Mức lương"
+      options={availableSalaryRanges.map(r => ({ key: r.key, label: r.label }))}
+      selected={filters.salaryRanges}
+      onToggle={onToggleSalary}
+      onClear={() => {}}
+    />
+  )}
+  <MultiDropdown
+    label="Độ tuổi"
+    options={AGE_RANGES.map(o => ({ key: o.key, label: o.label }))}
+    selected={filters.ageRanges}
+    onToggle={onToggleAge}
+    onClear={() => {}}
+  />
+  {activeCount > 0 && (
+    <button onClick={onResetFilters}
+      className="flex-shrink-0 px-3 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs transition border border-white/30">
+      Xóa ({activeCount})
+    </button>
+  )}
+</div>
     </div>
   );
 }
@@ -552,10 +556,16 @@ export default function HomePage() {
         return pMin <= range.max && pMax >= range.min;
       }));
     }
-    if (filters.ageMaxes.length > 0) {
-      const maxAge = Math.max(...filters.ageMaxes);
-      r = r.filter(p => !p.age_max || p.age_max <= maxAge);
-    }
+if (filters.ageRanges.length > 0) {
+  r = r.filter(p =>
+    !p.age_max ||
+    filters.ageRanges.some(key => {
+      const ageRange = AGE_RANGES.find(ar => ar.key === key);  // đổi r → ar
+      if (!ageRange) return false;
+      return p.age_max! >= ageRange.min;
+    })
+  );
+}
     r.sort((a, b) => tagPriority(b.tags) - tagPriority(a.tags));
     return r;
   }, [projects, search, filters]);
@@ -564,14 +574,18 @@ export default function HomePage() {
 
   const totalPages  = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated   = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const activeCount = filters.cities.length + filters.salaryRanges.length + filters.ageMaxes.length;
+const activeCount = filters.cities.length + filters.salaryRanges.length + filters.ageRanges.length;
 
   const toggleCity   = (city: string) => setFilters(prev => ({ ...prev, cities: prev.cities.includes(city) ? prev.cities.filter(c => c !== city) : [...prev.cities, city] }));
   const toggleSalary = (key: string)  => setFilters(prev => ({ ...prev, salaryRanges: prev.salaryRanges.includes(key) ? prev.salaryRanges.filter(k => k !== key) : [...prev.salaryRanges, key] }));
-  const toggleAge    = (key: string)  => {
-    const max = Number(key);
-    setFilters(prev => ({ ...prev, ageMaxes: prev.ageMaxes.includes(max) ? prev.ageMaxes.filter(m => m !== max) : [...prev.ageMaxes, max] }));
-  };
+const toggleAge = (key: string) => {
+  setFilters(prev => ({
+    ...prev,
+    ageRanges: prev.ageRanges.includes(key)
+      ? prev.ageRanges.filter(k => k !== key)
+      : [...prev.ageRanges, key],
+  }));
+};
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
   const sharedPanelProps = {
@@ -617,18 +631,8 @@ export default function HomePage() {
     <>
       <Script id="json-ld" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="min-h-screen bg-gray-50">
+      <SiteLayout>
 
-        {/* ── HEADER ── */}
-        <header role="banner" className="sticky top-0 z-40 bg-white border-b shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-            <Link href="/" aria-label="K-Outsourcing – Trang chủ">
-              <img src="/logo.png" alt="K-Outsourcing logo" className="h-8 w-auto" width={120} height={32} />
-            </Link>
-          </div>
-        </header>
-
-        <main id="main-content">
 
           {/* ════════════════════════════════════════════════════
               PC HERO: Search panel (left, 40%) + Banner (right, 60%)
@@ -789,7 +793,7 @@ export default function HomePage() {
                 </div>
 <div className="rounded-2xl overflow-hidden shadow-xl bg-orange-50">
   <img
-    src="/banners/mobile-2.png"
+    src="/banners/ctv_banner.png"
     alt="Chương trình Cộng tác viên"
     className="w-full h-full object-cover"
     style={{ aspectRatio: '3/2' }}
@@ -804,113 +808,8 @@ export default function HomePage() {
   👆 Bấm vào công việc để xem chi tiết & ứng tuyển
 </div>
           <CTVModal open={ctvOpen} onClose={() => setCtvOpen(false)} />
-        </main>
 
-        {/* ── FOOTER ── */}
-        <footer role="contentinfo" className="bg-gray-100 border-t border-gray-200 pt-10 pb-8 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto">
-            {/*
-              Layout:
-              - Mobile:  col1 full width → then col2+col3 side-by-side (2 cols)
-              - PC:      col1 (40%) | col2 hotline (30%) | col3 email+social (30%)
-
-              Trick: outer grid = 2-col on mobile (col1 spans 2), 3-col on sm+
-            */}
-            <div className="grid grid-cols-2 sm:grid-cols-[2fr_1.5fr_1.5fr] gap-6 lg:gap-10">
-
-              {/* Col 1 — spans full width on mobile, 1 col on sm+ */}
-              <div className="col-span-2 sm:col-span-1">
-                <Link href="/" aria-label="K-Outsourcing – Trang chủ">
-                  <img src="/logo.png" alt="K-Outsourcing" className="h-9 w-auto mb-4" width={140} height={36} />
-                </Link>
-                <p className="text-gray-500 text-[13px] leading-relaxed mb-3">
-                  <strong className="text-gray-700 font-bold">Công ty Cổ phần Giải pháp nhân sự & Tư vấn đầu tư K-Outsourcing</strong>{' '}
-                  — cung cấp dịch vụ cho thuê lại lao động và giải pháp nhân sự toàn diện cho doanh nghiệp.
-                </p>
-                <address className="not-italic">
-                  <span className="inline-flex items-start gap-1.5 text-[13px] text-gray-500 leading-relaxed">
-                    <svg className="w-3.5 h-3.5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    B-TT13-04, Khu nhà ở Ngân Hà Vạn Phúc, Phường Hà Đông, TP Hà Nội, Việt Nam
-                  </span>
-                </address>
-              </div>
-
-              {/* Col 2 — Hotline (col-span-1 on both mobile and sm+) */}
-              <div className="col-span-1">
-                <p className="text-black font-black text-[10px] uppercase tracking-widest mb-3">Hotline tuyển dụng</p>
-                <div className="space-y-3">
-                  {[
-                    { number: '0325 277 292', label: 'Tư vấn miễn phí 24/7' },
-                    { number: '0397 013 122', label: 'Hỗ trợ ứng viên' },
-                  ].map(phone => (
-                    <a key={phone.number} href={`tel:${phone.number.replace(/\s/g, '')}`}
-                      className="flex items-center gap-2 group">
-                      <span className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-orange-600">
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                        </svg>
-                      </span>
-                      <div>
-                        <p className="text-gray-800 font-black text-[13px] leading-none group-hover:text-orange-500 transition-colors">{phone.number}</p>
-                        <p className="text-gray-400 text-[10px] mt-0.5">{phone.label}</p>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-              {/* Col 3 — Email + Social (col-span-1 on both mobile and sm+) */}
-              <div className="col-span-1">
-                <p className="text-black font-black text-[10px] uppercase tracking-widest mb-3">Email</p>
-                <a href="mailto:info@koutsourcing.vn" className="flex items-center gap-2 group mb-5">
-                  <span className="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0 transition-all group-hover:bg-orange-600">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                    </svg>
-                  </span>
-                  <div>
-                    <p className="text-gray-800 font-black text-[13px] leading-none group-hover:text-orange-500 transition-colors break-all">info@koutsourcing.vn</p>
-                    <p className="text-gray-400 text-[10px] mt-0.5">Phản hồi trong 24h</p>
-                  </div>
-                </a>
-
-                <p className="text-black font-black text-[10px] uppercase tracking-widest mb-2.5">Theo dõi chúng tôi</p>
-                <div className="flex gap-2">
-                  {/* Facebook — brand blue #1877F2 */}
-                  <a href="https://www.facebook.com/KOutsourcingVietNam" target="_blank" rel="noopener noreferrer"
-                    aria-label="Facebook K-Outsourcing"
-                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-85"
-                    style={{ backgroundColor: '#1877F2' }}>
-                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-                    </svg>
-                  </a>
-                  {/* Zalo — brand blue #0068FF */}
-                  <a href="https://zalo.me/koutsourcing" target="_blank" rel="noopener noreferrer"
-                    aria-label="Zalo K-Outsourcing"
-                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-85"
-                    style={{ backgroundColor: '#0068FF' }}>
-                    <span className="text-[9px] font-black text-white leading-none tracking-tight">Zalo</span>
-                  </a>
-                  {/* TikTok — brand black */}
-                  <a href="https://www.tiktok.com/@nhanluckos" target="_blank" rel="noopener noreferrer"
-                    aria-label="TikTok K-Outsourcing"
-                    className="w-8 h-8 rounded-lg bg-black flex items-center justify-center transition-all hover:opacity-80">
-                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/>
-                    </svg>
-                  </a>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </footer>
-
-      </div>
+</SiteLayout>
     </>
   );
 }
