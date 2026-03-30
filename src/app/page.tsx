@@ -660,6 +660,7 @@ const toggleAge = (key: string) => {
     <div className="max-w-2xl mx-auto text-center px-4 pt-6 pb-2">
       <h1 className="text-2xl font-black text-white leading-tight mb-1">KHÁM PHÁ CÔNG VIỆC</h1>
       <p className="text-2xl font-black text-amber-100 leading-tight mb-4">MƠ ƯỚC CỦA BẠN</p>
+      <p className="text-orange-100 text-xs mb-4">Hàng nghìn cơ hội đang chờ bạn</p>
     </div>
     <SearchFilterPanel {...sharedPanelProps} variant="hero" />
   </div>
