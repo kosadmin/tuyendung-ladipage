@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import SiteLayout from '@/components/SiteLayout';
+
+const ApplyModal = dynamic(() => import('@/components/ApplyModal'), { ssr: false });
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface ProjectDetail {
@@ -11,6 +15,7 @@ interface ProjectDetail {
   project: string;
   project_type: string;
   company: string;
+  company_intro: string | null;       // ← thêm mới
   address_city: string;
   adress_full: string | null;
   map_link: string | null;
@@ -29,6 +34,7 @@ interface ProjectDetail {
   deploy_end: string | null;
   interview_process: string | null;
   register_process: string | null;
+  // pickup_support: bỏ hiển thị (vẫn fetch nhưng không render)
   pickup_support: string | null;
   probation_info: string | null;
   warranty_period: string | null;
@@ -54,13 +60,6 @@ interface ProjectDetail {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const statusConfig: Record<string, { color: string; dot: string }> = {
-  'Đang tuyển': { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
-  'Tạm dừng':   { color: 'bg-amber-50 text-amber-700 border-amber-200',       dot: 'bg-amber-400'  },
-  'Hoàn thành': { color: 'bg-blue-50 text-blue-700 border-blue-200',           dot: 'bg-blue-500'   },
-  'Hủy':        { color: 'bg-gray-100 text-gray-500 border-gray-200',          dot: 'bg-gray-400'   },
-};
-
 const TAG_COLORS: Record<string, string> = {
   'Tuyển gấp':  'bg-red-500 text-white',
   'Hot':        'bg-rose-400 text-white',
@@ -70,7 +69,8 @@ const TAG_COLORS: Record<string, string> = {
   'VIP':        'bg-purple-600 text-white',
 };
 const FALLBACK_TAG_COLORS = ['bg-teal-500 text-white','bg-cyan-600 text-white','bg-indigo-500 text-white','bg-pink-500 text-white'];
-const tagColor = (t: string) => TAG_COLORS[t] ?? FALLBACK_TAG_COLORS[t.split('').reduce((a,c)=>a+c.charCodeAt(0),0)%FALLBACK_TAG_COLORS.length];
+const tagColor = (t: string) =>
+  TAG_COLORS[t] ?? FALLBACK_TAG_COLORS[t.split('').reduce((a,c) => a + c.charCodeAt(0), 0) % FALLBACK_TAG_COLORS.length];
 
 function formatSalary(min: number | null, max: number | null): string {
   if (!min && !max) return 'Thỏa thuận';
@@ -211,13 +211,33 @@ function MapCard({ mapLink, address }: { mapLink: string; address: string }) {
   );
 }
 
+// ── Apply Button ───────────────────────────────────────────────────────────
+function ApplyButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5
+        bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
+        text-white font-black text-sm rounded-2xl
+        shadow-lg shadow-orange-200 hover:shadow-xl hover:shadow-orange-200/80
+        transition-all duration-200"
+    >
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      Ứng tuyển ngay
+    </button>
+  );
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 export default function ProjectDetailPage() {
   const { project_id } = useParams<{ project_id: string }>();
 
-  const [project, setProject] = useState<ProjectDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
+  const [project, setProject]   = useState<ProjectDetail | null>(null);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
+  const [applyOpen, setApply]   = useState(false);
 
   useEffect(() => {
     if (!project_id) return;
@@ -234,22 +254,27 @@ export default function ProjectDetailPage() {
     })();
   }, [project_id]);
 
+  // ── Loading ──
   if (loading) return (
-    <div className="fixed inset-0 flex items-center justify-center gap-3 text-gray-400 bg-gray-50">
-      <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"/>
-      Đang tải...
-    </div>
+    <SiteLayout>
+      <div className="min-h-[60vh] flex items-center justify-center gap-3 text-gray-400">
+        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"/>
+        Đang tải...
+      </div>
+    </SiteLayout>
   );
 
+  // ── Error ──
   if (error || !project) return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-gray-400 gap-3 bg-gray-50">
-      <span className="text-4xl">😕</span>
-      <p className="font-bold">{error ?? 'Không tìm thấy thông tin'}</p>
-      <Link href="/" className="text-orange-500 text-sm underline">← Xem tất cả vị trí</Link>
-    </div>
+    <SiteLayout>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-400 gap-3">
+        <span className="text-4xl">😕</span>
+        <p className="font-bold">{error ?? 'Không tìm thấy thông tin'}</p>
+        <Link href="/" className="text-orange-500 text-sm underline">← Xem tất cả vị trí</Link>
+      </div>
+    </SiteLayout>
   );
 
-  const status      = statusConfig[project.status] ?? statusConfig['Đang tuyển'];
   const positions   = project.position?.split(',').map(p => p.trim()).filter(Boolean) ?? [];
   const addressFull = project.adress_full || project.address_city;
   const ageLabel    = project.age_min && project.age_max
@@ -269,6 +294,8 @@ export default function ProjectDetailPage() {
   // ── Sections ───────────────────────────────────────────────────────────
   const SectionDetail = (
     <Section title="Thông tin công việc" icon={<IconDoc/>}>
+      {/* company_intro trước mô tả công việc */}
+      <InfoRow label="Giới thiệu công ty"   value={project.company_intro}/>
       <InfoRow label="Mô tả công việc"      value={project.job_description}/>
       <InfoRow label="Bộ phận"              value={project.department}/>
       <InfoRow label="Thời gian làm việc"   value={project.work_schedule}/>
@@ -317,14 +344,17 @@ export default function ProjectDetailPage() {
 
   const SectionRequire = (
     <Section title="Yêu cầu ứng viên" icon={<IconShield/>}>
-      <ReqItem icon="⚤"  label="Giới tính"            value={project.gender_required}/>
-      <ReqItem icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg>}
-               label="Độ tuổi"              value={ageLabel}/>
-      <ReqItem icon="🎓" label="Học vấn"               value={project.education_required}/>
-      <ReqItem icon="💼" label="Kinh nghiệm"            value={project.experience_required}/>
+      <ReqItem icon="⚤"  label="Giới tính"        value={project.gender_required}/>
+      <ReqItem
+        icon={<svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg>}
+        label="Độ tuổi"
+        value={ageLabel}
+      />
+      <ReqItem icon="🎓" label="Học vấn"           value={project.education_required}/>
+      <ReqItem icon="💼" label="Kinh nghiệm"       value={project.experience_required}/>
       <ReqItem icon="👤" label="Ngoại hình / Thể chất" value={project.appearance_required}/>
-      <ReqItem icon="⚙️" label="Kỹ năng"               value={project.skill_required}/>
-      <ReqItem icon="🔄" label="Tái tuyển dụng"        value={project.rehire_accepted}/>
+      <ReqItem icon="⚙️" label="Kỹ năng"           value={project.skill_required}/>
+      <ReqItem icon="🔄" label="Tái tuyển dụng"    value={project.rehire_accepted}/>
     </Section>
   );
 
@@ -336,12 +366,12 @@ export default function ProjectDetailPage() {
   );
 
   const SectionProcess = (
+    // pickup_support: không hiển thị
     <Section title="Quy trình tuyển dụng" icon={<IconProcess/>}>
-      <InfoRow label="Đăng ký & Chốt danh sách"  value={project.register_process}/>
-      <InfoRow label="Phỏng vấn & Nhận việc"      value={project.interview_process}/>
-      <InfoRow label="Đầu mối đón / hỗ trợ"       value={project.pickup_support}/>
-      <InfoRow label="Thử việc"                   value={project.probation_info}/>
-      <InfoRow label="Thời hạn bảo hành"          value={project.warranty_period}/>
+      <InfoRow label="Đăng ký & Chốt danh sách" value={project.register_process}/>
+      <InfoRow label="Phỏng vấn & Nhận việc"    value={project.interview_process}/>
+      <InfoRow label="Thử việc"                 value={project.probation_info}/>
+      <InfoRow label="Thời hạn bảo hành"        value={project.warranty_period}/>
     </Section>
   );
 
@@ -352,18 +382,17 @@ export default function ProjectDetailPage() {
   ) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* TOP NAV */}
-      <div className="sticky top-0 z-40 bg-white border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+    <SiteLayout>
+      {/* Breadcrumb */}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center gap-2">
           <Link href="/" className="flex items-center gap-1.5 text-gray-400 hover:text-orange-500 text-xs font-bold transition">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 5l-7 7 7 7"/>
             </svg>
             Tất cả vị trí
           </Link>
-          <div className="flex-1"/>
+          <span className="text-gray-200">›</span>
           <span className="text-[11px] text-gray-400 font-mono hidden sm:inline">{project.project_id}</span>
         </div>
       </div>
@@ -371,22 +400,21 @@ export default function ProjectDetailPage() {
       {/* BODY */}
       <div className="max-w-6xl mx-auto p-4 space-y-4">
 
-        {/* HEADER CARD */}
+        {/* ── HEADER CARD ─────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
 
-          {/* Tags + Status */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-bold border ${status.color}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}/>{project.status}
-            </span>
-            {tagList.map(tag => (
-              <span key={tag} className={`${tagColor(tag)} text-[11px] font-black px-3 py-1 rounded-lg tracking-wide shadow-sm`}>
-                {tag}
-              </span>
-            ))}
-          </div>
+          {/* Tags — không hiển thị status */}
+          {tagList.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {tagList.map(tag => (
+                <span key={tag} className={`${tagColor(tag)} text-[11px] font-black px-3 py-1 rounded-lg tracking-wide shadow-sm`}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
-          {/* Logo + Tên */}
+          {/* Logo + Tên dự án */}
           <div className="flex gap-4 items-start mb-3">
             <div className="flex-shrink-0 w-14 h-14 rounded-2xl border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden">
               {project.icon_job
@@ -406,7 +434,7 @@ export default function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* Address */}
+          {/* Địa chỉ */}
           <div className="flex items-center gap-1.5 mb-4">
             <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
@@ -415,8 +443,9 @@ export default function ProjectDetailPage() {
             <span className="text-gray-500 text-[12px]">{addressFull}</span>
           </div>
 
-          {/* Metric pills */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+          {/* Metric pills: Thu nhập | Hình thức | Độ tuổi | Giới tính */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            {/* Thu nhập */}
             {(project.salary_min || project.salary_max) && (
               <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
                 <span className="text-base flex-shrink-0">💰</span>
@@ -426,6 +455,7 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
             )}
+            {/* Hình thức */}
             {project.hiring_form && (
               <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
                 <span className="text-base flex-shrink-0">📋</span>
@@ -435,6 +465,7 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
             )}
+            {/* Độ tuổi */}
             {ageLabel && (
               <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
                 <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -446,15 +477,32 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
             )}
+            {/* Giới tính — thêm mới */}
+            {project.gender_required && (
+              <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                <span className="text-base flex-shrink-0">
+                  {project.gender_required.toLowerCase().includes('nữ') ? '👩' : project.gender_required.toLowerCase().includes('nam') ? '👨' : '⚤'}
+                </span>
+                <div>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Giới tính</p>
+                  <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.gender_required}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Highlight */}
           {project.highlight_info && (
-            <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
+            <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 mb-4">
               <span>🎁</span>
               <p className="text-amber-700 font-bold text-[13px]">{project.highlight_info}</p>
             </div>
           )}
+
+          {/* ── Nút Ứng tuyển ngay ── */}
+          <div className="pt-1">
+            <ApplyButton onClick={() => setApply(true)} />
+          </div>
         </div>
 
         {/* PC: 2 cột — Mobile: 1 cột */}
@@ -468,6 +516,11 @@ export default function ProjectDetailPage() {
           </div>
           {/* RIGHT 1/3 */}
           <div className="space-y-4">
+            {/* Sticky apply button on desktop */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-4">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-3">Quan tâm vị trí này?</p>
+              <ApplyButton onClick={() => setApply(true)} />
+            </div>
             {project.map_link && (
               <div className="bg-white rounded-2xl border border-gray-100 p-4">
                 <MapCard mapLink={project.map_link} address={addressFull}/>
@@ -495,7 +548,26 @@ export default function ProjectDetailPage() {
           {SectionNote}
         </div>
 
+        {/* Mobile sticky apply bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 p-3 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-lg">
+          <ApplyButton onClick={() => setApply(true)} />
+        </div>
+        {/* Padding để tránh bị che bởi sticky bar mobile */}
+        <div className="lg:hidden h-20" aria-hidden="true"/>
+
       </div>
-    </div>
+
+      {/* Apply Modal */}
+      <ApplyModal
+        open={applyOpen}
+        onClose={() => setApply(false)}
+        company={project.company}
+        positions={positions}
+        projectId={project.project_id}
+        projectName={project.project}
+        projectType={project.project_type}
+        addressCity={project.address_city}
+      />
+    </SiteLayout>
   );
 }
