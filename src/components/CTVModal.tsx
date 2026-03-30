@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 
+
 interface Props { open: boolean; onClose: () => void; }
 
 export default function CTVModal({ open, onClose }: Props) {
@@ -16,16 +17,26 @@ export default function CTVModal({ open, onClose }: Props) {
 
   const set = (k: string, v: string | boolean) => setForm(prev => ({ ...prev, [k]: v }));
 
-  const handleSubmit = async () => {
-    if (!form.fullName || !form.phone) return alert('Vui lòng điền Họ tên và Số điện thoại');
-    if (!form.agreed) return alert('Vui lòng đồng ý điều khoản dịch vụ');
-    setLoading(true);
-    // TODO: gọi API / Supabase insert ở đây
-    // await supabase.from('ctv_registrations').insert([form]);
-    await new Promise(r => setTimeout(r, 800)); // giả lập
-    setLoading(false);
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxkzKZmxx3jhc9J5EatJGCYMi5Ul23BbG1VGCwAdAxB8bOt39DroCz9fFyRDZTfezTr/exec';
+
+const handleSubmit = async () => {
+  if (!form.fullName || !form.phone) return alert('Vui lòng điền Họ tên và Số điện thoại');
+  if (!form.agreed) return alert('Vui lòng đồng ý điều khoản');
+  setLoading(true);
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors', // bắt buộc với Apps Script
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
     setSubmitted(true);
-  };
+  } catch {
+    alert('Có lỗi xảy ra, vui lòng thử lại.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
@@ -34,7 +45,7 @@ export default function CTVModal({ open, onClose }: Props) {
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-widest text-orange-500 mb-1">Đăng ký</p>
+            <p className="text-base font-black uppercase tracking-widest text-orange-500 mb-1">Đăng ký</p>
             <h2 className="text-xl font-black text-gray-900">Trở thành Cộng tác viên</h2>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition">✕</button>
