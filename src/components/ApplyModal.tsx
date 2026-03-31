@@ -255,7 +255,7 @@ export default function ApplyModal({
   projectId, projectName, projectType,
   addressCity,
 }: ApplyModalProps) {
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyXfVG0YS7hOOmWJZHVTUpZTbWKxJIEho5e_3eBS8q_2T83PeztWqHLehwM1VYA8FxL/exec';
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwCRMgc3rqlSyZFSvsXCd0vtwVWp8UjJRz4gwjFb7LpLnP-3CKJPd8C0iAHfSx8MYHJ/exec';
 
   const [form, setForm] = useState<FormData>({
     candidate_name: '',
