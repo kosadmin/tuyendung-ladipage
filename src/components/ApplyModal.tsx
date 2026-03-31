@@ -219,7 +219,7 @@ function validateForm(data: FormData): FormErrors {
 // ── Input Components ───────────────────────────────────────────────────────
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1.5">
+    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">
       {children}
       {required && <span className="text-red-400 ml-0.5">*</span>}
     </label>
@@ -228,7 +228,7 @@ function Label({ children, required }: { children: React.ReactNode; required?: b
 
 function FieldError({ msg }: { msg?: string }) {
   if (!msg) return null;
-  return <p className="mt-1 text-[11px] text-red-500 font-medium">{msg}</p>;
+  return <p className="mt-1 text-xs text-red-500 font-medium">{msg}</p>;
 }
 
 function InputField({
@@ -382,8 +382,8 @@ export default function ApplyModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
           <div>
-            <h2 className="font-black text-gray-900 text-base">Ứng tuyển ngay</h2>
-            <p className="text-[11px] text-gray-400 mt-0.5 font-medium">{company}</p>
+            <h2 className="font-black text-gray-900 text-xl">Ứng tuyển ngay</h2>
+            <p className="text-xs text-gray-400 mt-0.5 font-medium">{company}</p>
           </div>
           <button
             onClick={onClose}
@@ -424,7 +424,7 @@ export default function ApplyModal({
 
               {/* Thông tin cá nhân */}
               <div className="space-y-4">
-                <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest">Thông tin cá nhân</p>
+                <p className="text-xs font-black text-orange-500 uppercase tracking-widest">Thông tin cá nhân</p>
 
                 <InputField
                   label="Họ và tên" required
@@ -476,7 +476,7 @@ export default function ApplyModal({
 
               {/* Thông tin ứng tuyển */}
               <div className="space-y-4 pt-1">
-                <p className="text-[11px] font-black text-orange-500 uppercase tracking-widest">Vị trí ứng tuyển</p>
+                <p className="text-xs font-black text-orange-500 uppercase tracking-widest">Vị trí ứng tuyển</p>
 
                 {/* Công ty — autofill, readonly */}
                 <div>
@@ -513,7 +513,7 @@ export default function ApplyModal({
 
               {/* Người giới thiệu */}
               <div className="space-y-4 pt-1">
-                <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Người giới thiệu <span className="text-gray-300 font-normal normal-case">(nếu có)</span></p>
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Người giới thiệu <span className="text-gray-300 font-normal normal-case">(nếu có)</span></p>
 
                 <InputField
                   label="Tên người giới thiệu"
