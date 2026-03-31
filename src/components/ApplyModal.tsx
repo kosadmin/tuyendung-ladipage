@@ -193,7 +193,7 @@ export default function ApplyModal({
   projectId, projectName, projectType,
   addressCity,
 }: ApplyModalProps) {
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzpGpevbJUNmIWUG4E-iackX6VAZxvCMcwL43QSaEc2IEvYo_drC3UZyq8CFKGXK-hw/exec';
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyXfVG0YS7hOOmWJZHVTUpZTbWKxJIEho5e_3eBS8q_2T83PeztWqHLehwM1VYA8FxL/exec';
 
   const [form, setForm] = useState<FormData>({
     full_name: '',
