@@ -223,13 +223,15 @@ function ActionButtons({
   incentiveLabel,
   onApply,
   onRefer,
+  layout = 'row',
 }: {
   incentiveLabel: string;
   onApply: () => void;
   onRefer: () => void;
+  layout?: 'row' | 'col';
 }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-2.5">
+    <div className={`flex gap-2.5 ${layout === 'col' ? 'flex-col' : 'flex-col sm:flex-row'}`}>
       <button
         onClick={onApply}
         className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5
@@ -245,14 +247,14 @@ function ActionButtons({
       <button
         onClick={onRefer}
         className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5
-          bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98]
+          bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
           text-white font-black text-sm rounded-2xl
-          shadow-lg shadow-emerald-200 hover:shadow-xl transition-all duration-200"
+          shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
       >
         <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        Giới thiệu · nhận {incentiveLabel}
+        Giới thiệu ứng viên · nhận {incentiveLabel}
       </button>
     </div>
   );
@@ -433,7 +435,7 @@ export default function ProjectDetailPage() {
         {/* ── HEADER CARD ─────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
 
-          {/* Tags — không hiển thị status */}
+          {/* Tags */}
           {tagList.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
               {tagList.map(tag => (
@@ -444,98 +446,131 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {/* Logo + Tên dự án */}
-          <div className="flex gap-4 items-start mb-3">
-            <div className="flex-shrink-0 w-14 h-14 rounded-2xl border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden">
-              {project.icon_job
-                ? <img src={project.icon_job} alt={project.company} className="w-full h-full object-contain p-1.5"/>
-                : <span className="text-2xl">🏭</span>}
-            </div>
+          {/* PC: info trái + buttons phải | Mobile: stack dọc */}
+          <div className="flex flex-col lg:flex-row lg:gap-6 lg:items-start">
+
+            {/* ── Cột trái: info ── */}
             <div className="flex-1 min-w-0">
-              <h1 className="font-black text-gray-900 text-xl leading-tight">{project.project}</h1>
-              <p className="text-orange-600 font-semibold text-sm mt-0.5">{project.company}</p>
-              {positions.length > 0 && (
-                <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
-                  {positions.map((pos, i) => (
-                    <span key={i} className="text-gray-700 font-semibold text-sm whitespace-nowrap">• {pos}</span>
-                  ))}
+
+              {/* Logo + Tên dự án */}
+              <div className="flex gap-4 items-start mb-3">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden">
+                  {project.icon_job
+                    ? <img src={project.icon_job} alt={project.company} className="w-full h-full object-contain p-1.5"/>
+                    : <span className="text-2xl">🏭</span>}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h1 className="font-black text-gray-900 text-xl leading-tight">{project.project}</h1>
+                  <p className="text-orange-600 font-semibold text-sm mt-0.5">{project.company}</p>
+                  {positions.length > 0 && (
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+                      {positions.map((pos, i) => (
+                        <span key={i} className="text-gray-700 font-semibold text-sm whitespace-nowrap">• {pos}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Địa chỉ */}
+              <div className="flex items-center gap-1.5 mb-4">
+                <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                  <circle cx="12" cy="11" r="3"/>
+                </svg>
+                <span className="text-gray-500 text-[12px]">{addressFull}</span>
+              </div>
+
+              {/* Metric pills */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                {(project.salary_min || project.salary_max) && (
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                    <span className="text-base flex-shrink-0">💰</span>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Thu nhập</p>
+                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{formatSalaryShort(project.salary_min, project.salary_max)}</p>
+                    </div>
+                  </div>
+                )}
+                {project.hiring_form && (
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                    <span className="text-base flex-shrink-0">📋</span>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Hình thức</p>
+                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.hiring_form}</p>
+                    </div>
+                  </div>
+                )}
+                {ageLabel && (
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                    <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/>
+                    </svg>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Độ tuổi</p>
+                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{ageLabel}</p>
+                    </div>
+                  </div>
+                )}
+                {project.gender_required && (
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                    <span className="text-base flex-shrink-0">
+                      {project.gender_required.toLowerCase().includes('nữ') ? '👩' : project.gender_required.toLowerCase().includes('nam') ? '👨' : '⚤'}
+                    </span>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Giới tính</p>
+                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.gender_required}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Highlight */}
+              {project.highlight_info && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
+                  <span>🎁</span>
+                  <p className="text-amber-700 font-bold text-[13px]">{project.highlight_info}</p>
                 </div>
               )}
+
+              {/* Buttons — chỉ hiện trên mobile (PC dùng cột phải) */}
+              <div className="lg:hidden mt-4">
+                <ActionButtons
+                  incentiveLabel={incentiveLabel}
+                  onApply={() => setApply(true)}
+                  onRefer={() => setCtvOpen(true)}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Địa chỉ */}
-          <div className="flex items-center gap-1.5 mb-4">
-            <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
-              <circle cx="12" cy="11" r="3"/>
-            </svg>
-            <span className="text-gray-500 text-[12px]">{addressFull}</span>
-          </div>
-
-          {/* Metric pills: Thu nhập | Hình thức | Độ tuổi | Giới tính */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-            {/* Thu nhập */}
-            {(project.salary_min || project.salary_max) && (
-              <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                <span className="text-base flex-shrink-0">💰</span>
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Thu nhập</p>
-                  <p className="text-[12px] font-bold text-gray-800 leading-snug">{formatSalaryShort(project.salary_min, project.salary_max)}</p>
-                </div>
-              </div>
-            )}
-            {/* Hình thức */}
-            {project.hiring_form && (
-              <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                <span className="text-base flex-shrink-0">📋</span>
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Hình thức</p>
-                  <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.hiring_form}</p>
-                </div>
-              </div>
-            )}
-            {/* Độ tuổi */}
-            {ageLabel && (
-              <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/>
+            {/* ── Cột phải: buttons (chỉ PC) ── */}
+            <div className="hidden lg:flex flex-col gap-2.5 w-64 flex-shrink-0 pt-1">
+              <button
+                onClick={() => setApply(true)}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5
+                  bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
+                  text-white font-black text-sm rounded-2xl
+                  shadow-lg shadow-orange-200 hover:shadow-xl transition-all duration-200"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Độ tuổi</p>
-                  <p className="text-[12px] font-bold text-gray-800 leading-snug">{ageLabel}</p>
-                </div>
-              </div>
-            )}
-            {/* Giới tính — thêm mới */}
-            {project.gender_required && (
-              <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                <span className="text-base flex-shrink-0">
-                  {project.gender_required.toLowerCase().includes('nữ') ? '👩' : project.gender_required.toLowerCase().includes('nam') ? '👨' : '⚤'}
-                </span>
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Giới tính</p>
-                  <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.gender_required}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Highlight */}
-          {project.highlight_info && (
-            <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 mb-4">
-              <span>🎁</span>
-              <p className="text-amber-700 font-bold text-[13px]">{project.highlight_info}</p>
+                Ứng tuyển ngay
+              </button>
+              <button
+                onClick={() => setCtvOpen(true)}
+                className="w-full flex items-center justify-center gap-2 px-5 py-3.5
+                  bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
+                  text-white font-black text-sm rounded-2xl
+                  shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Giới thiệu ứng viên · nhận {incentiveLabel}
+              </button>
             </div>
-          )}
 
-          {/* ── Nút hành động ── */}
-          <div className="pt-1">
-            <ActionButtons
-              incentiveLabel={incentiveLabel}
-              onApply={() => setApply(true)}
-              onRefer={() => setCtvOpen(true)}
-            />
           </div>
         </div>
 
@@ -594,7 +629,7 @@ export default function ProjectDetailPage() {
             <button
               onClick={() => setCtvOpen(true)}
               className="flex-1 flex items-center justify-center gap-1.5 py-3
-                bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98]
+                bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
                 text-white font-black text-[13px] rounded-xl shadow-md transition-all"
             >
               <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
