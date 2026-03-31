@@ -477,7 +477,7 @@ export default function ProjectDetailPage() {
             </div>
 
             {/* Cột phải: 2 nút — chỉ PC */}
-            <div className="hidden lg:flex flex-col gap-2.5 w-80 flex-shrink-0">
+            <div className="hidden lg:flex flex-col gap-2.5 w-96 flex-shrink-0">
               <button
                 onClick={() => setApply(true)}
                 className="w-full flex items-center justify-center gap-2 px-6 py-4
