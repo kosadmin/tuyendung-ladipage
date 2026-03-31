@@ -168,6 +168,11 @@ interface ApplyModalProps {
   projectName: string;
   projectType: string;
   addressCity?: string;
+  assignmentOverride?: {           // ← THÊM
+    assigned_user: string;
+    assigned_user_name: string;
+    assigned_user_group: string;
+  };
 }
 
 interface FormData {
@@ -254,6 +259,7 @@ export default function ApplyModal({
   company, positions,
   projectId, projectName, projectType,
   addressCity,
+  assignmentOverride,         // ← THÊM
 }: ApplyModalProps) {
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwCRMgc3rqlSyZFSvsXCd0vtwVWp8UjJRz4gwjFb7LpLnP-3CKJPd8C0iAHfSx8MYHJ/exec';
 
@@ -317,7 +323,8 @@ export default function ApplyModal({
     setSubmit(true); setSubmitErr(null);
 
     const timestamp = getIsoString();
-    const assignment = getAssignedUser({ project_type: projectType, address_city: addressCity });
+    // Sửa thành:
+const assignment = assignmentOverride ?? getAssignedUser({ project_type: projectType, address_city: addressCity });
 
     // Xây dựng take_note từ người giới thiệu
     let take_note = '';
