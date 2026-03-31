@@ -33,56 +33,122 @@
  * ═══════════════════════════════════════════════════════════════
  *
  * // Tên tab sheet chứa dữ liệu leads (hàng 1 = header tên cột)
- * const SHEET_NAME = 'Leads';
+ * const SHEET_NAME = 'candidates';
+ *
+ * // Sinh candidate_id tiếp theo dạng UV00000001 tăng dần
+ * function generateCandidateId(sheet, headers) {
+ *   const idColIdx = headers.indexOf('candidate_id');
+ *   if (idColIdx === -1) return '';
+ *   const lastRow = sheet.getLastRow();
+ *   if (lastRow <= 1) return 'UV00000001';
+ *   const idValues = sheet.getRange(2, idColIdx + 1, lastRow - 1, 1).getValues();
+ *   let maxNum = 0;
+ *   idValues.forEach(function(row) {
+ *     const match = String(row[0]).match(/^UV(\d+)$/);
+ *     if (match) {
+ *       const num = parseInt(match[1], 10);
+ *       if (num > maxNum) maxNum = num;
+ *     }
+ *   });
+ *   return 'UV' + String(maxNum + 1).padStart(8, '0');
+ * }
  *
  * function doPost(e) {
- *   const lock = LockService.scriptLock();
+ *   const lock = LockService.getScriptLock();
  *   lock.tryLock(10000);
  *   try {
- *     // Parse payload từ form
  *     const data = JSON.parse(e.postData.contents);
  *
  *     const ss    = SpreadsheetApp.getActiveSpreadsheet();
  *     const sheet = ss.getSheetByName(SHEET_NAME);
  *     if (!sheet) throw new Error('Không tìm thấy sheet: ' + SHEET_NAME);
  *
- *     // Đọc hàng header (hàng 1) để lấy map tên_cột → index
+ *     // Đọc header hàng 1, trim whitespace
  *     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn())
- *                          .getValues()[0];
+ *                          .getValues()[0]
+ *                          .map(function(h) { return String(h).trim(); });
  *
- *     // Tạo mảng row rỗng đúng độ dài header
+ *     // Bổ sung các trường sinh tự động phía server
+ *     data.candidate_id              = generateCandidateId(sheet, headers);
+ *     data.interested                = false;
+ *     data.scheduled_for_interview   = false;
+ *     data.show_up_for_interview     = false;
+ *     data.pass_interview            = false;
+ *     data.onboard                   = false;
+ *     data.reject_offer              = false;
+ *     data.unqualified               = false;
+ *
+ *     // Build row theo thứ tự header thực tế trong sheet
  *     const row = new Array(headers.length).fill('');
- *
- *     // Điền từng field vào đúng cột theo tên header
- *     // (cột nào không khớp tên thì bỏ qua, không báo lỗi)
- *     headers.forEach(function(header, idx) {
- *       const key = String(header).trim();
+ *     headers.forEach(function(key, idx) {
  *       if (key in data) {
- *         row[idx] = data[key] === null || data[key] === undefined ? '' : data[key];
+ *         row[idx] = (data[key] === null || data[key] === undefined) ? '' : data[key];
  *       }
  *     });
  *
  *     sheet.appendRow(row);
+ *
+ *     // Ép cột phone thành Text để Sheets không tự convert thành số
+ *     const phoneColIdx = headers.indexOf('phone');
+ *     if (phoneColIdx !== -1) {
+ *       const newRow = sheet.getLastRow();
+ *       sheet.getRange(newRow, phoneColIdx + 1).setNumberFormat('@STRING@');
+ *       sheet.getRange(newRow, phoneColIdx + 1).setValue(String(data.phone));
+ *     }
  *
  *     return ContentService
  *       .createTextOutput(JSON.stringify({ success: true }))
  *       .setMimeType(ContentService.MimeType.JSON);
  *
  *   } catch (err) {
+ *     Logger.log('LỖI: ' + err.message);
+ *     const ss2 = SpreadsheetApp.getActiveSpreadsheet();
+ *     const logSheet = ss2.getSheetByName('Logs') || ss2.insertSheet('Logs');
+ *     logSheet.appendRow([new Date(), err.message, err.stack]);
  *     return ContentService
  *       .createTextOutput(JSON.stringify({ success: false, error: err.message }))
  *       .setMimeType(ContentService.MimeType.JSON);
  *   } finally {
- *     lock.releaseLock();
+ *     try { lock.releaseLock(); } catch(_) {}
  *   }
  * }
  *
- * // Test thủ công từ Apps Script Editor (không cần deploy):
- * // Chạy hàm này để kiểm tra script đọc header đúng không
+ * // Test đọc header — chạy trong Editor để kiểm tra
  * function testHeaders() {
  *   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
  *   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
  *   Logger.log(headers);
+ * }
+ *
+ * // Test insert thủ công
+ * function testDoPost() {
+ *   const fakeEvent = {
+ *     postData: {
+ *       contents: JSON.stringify({
+ *         created_at: new Date().toISOString(),
+ *         last_updated_at: new Date().toISOString(),
+ *         created_by: 'KOSAD',
+ *         candidate_name: 'Test User',
+ *         gender: 'Nam',
+ *         date_of_birth: '1995-01-01',
+ *         phone: '0912345678',
+ *         company: 'Test Co',
+ *         position: 'Test Pos',
+ *         project_id: 'TEST01',
+ *         project: 'Test Project',
+ *         project_type: 'Test',
+ *         take_note: '',
+ *         assigned_user: 'KOSAD',
+ *         assigned_user_name: 'KOS Admin',
+ *         assigned_user_group: 'admin',
+ *         data_source_dept: 'Marketing',
+ *         data_source_type_group: 'MKT Organic khác',
+ *         data_source_type: 'LadiPage',
+ *         new: true,
+ *       })
+ *     }
+ *   };
+ *   doPost(fakeEvent);
  * }
  * ═══════════════════════════════════════════════════════════════
  */
@@ -105,7 +171,7 @@ interface ApplyModalProps {
 }
 
 interface FormData {
-  full_name: string;
+  candidate_name: string;
   gender: string;
   date_of_birth: string;
   phone: string;
@@ -116,7 +182,7 @@ interface FormData {
 }
 
 interface FormErrors {
-  full_name?: string;
+  candidate_name?: string;
   gender?: string;
   date_of_birth?: string;
   phone?: string;
@@ -125,12 +191,8 @@ interface FormErrors {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function getVNIsoString(): string {
-  // Trả về ISO timestamp theo giờ VN (UTC+7)
-  const now = new Date();
-  const vnOffset = 7 * 60 * 60 * 1000;
-  const vnDate = new Date(now.getTime() + vnOffset);
-  return vnDate.toISOString().replace('Z', '+07:00');
+function getIsoString(): string {
+  return new Date().toISOString();
 }
 
 function validatePhone(phone: string): boolean {
@@ -139,7 +201,7 @@ function validatePhone(phone: string): boolean {
 
 function validateForm(data: FormData): FormErrors {
   const errors: FormErrors = {};
-  if (!data.full_name.trim()) errors.full_name = 'Vui lòng nhập họ tên';
+  if (!data.candidate_name.trim()) errors.candidate_name = 'Vui lòng nhập họ tên';
   if (!data.gender) errors.gender = 'Vui lòng chọn giới tính';
   if (!data.date_of_birth) errors.date_of_birth = 'Vui lòng nhập ngày sinh';
   if (!data.phone.trim()) {
@@ -196,7 +258,7 @@ export default function ApplyModal({
   const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyXfVG0YS7hOOmWJZHVTUpZTbWKxJIEho5e_3eBS8q_2T83PeztWqHLehwM1VYA8FxL/exec';
 
   const [form, setForm] = useState<FormData>({
-    full_name: '',
+    candidate_name: '',
     gender: '',
     date_of_birth: '',
     phone: '',
@@ -220,7 +282,7 @@ export default function ApplyModal({
   useEffect(() => {
     if (open) {
       setForm({
-        full_name: '', gender: '', date_of_birth: '', phone: '',
+        candidate_name: '', gender: '', date_of_birth: '', phone: '',
         company,
         position: positions.length === 1 ? positions[0] : '',
         referrer_name: '', referrer_phone: '',
@@ -248,13 +310,13 @@ export default function ApplyModal({
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
 
     if (!ENDPOINT) {
-      setSubmitErr('Chưa cấu hình endpoint Google Sheet (NEXT_PUBLIC_APPLY_SHEET_ENDPOINT). Vui lòng liên hệ quản trị viên.');
+      setSubmitErr('Chưa cấu hình endpoint Google Sheet. Vui lòng liên hệ quản trị viên.');
       return;
     }
 
     setSubmit(true); setSubmitErr(null);
 
-    const timestamp = getVNIsoString();
+    const timestamp = getIsoString();
     const assignment = getAssignedUser({ project_type: projectType, address_city: addressCity });
 
     // Xây dựng take_note từ người giới thiệu
@@ -268,7 +330,7 @@ export default function ApplyModal({
       created_at:             timestamp,
       last_updated_at:        timestamp,
       created_by:             'KOSAD',
-      full_name:              form.full_name.trim(),
+      candidate_name:         form.candidate_name.trim(),
       gender:                 form.gender,
       date_of_birth:          form.date_of_birth,
       phone:                  form.phone.trim(),
@@ -282,7 +344,7 @@ export default function ApplyModal({
       assigned_user_name:     assignment.assigned_user_name,
       assigned_user_group:    assignment.assigned_user_group,
       data_source_dept:       'Marketing',
-      data_source_type_group: 'MKT Organic',
+      data_source_type_group: 'MKT Organic khác',
       data_source_type:       'LadiPage',
       new:                    true,
     };
@@ -367,9 +429,9 @@ export default function ApplyModal({
                 <InputField
                   label="Họ và tên" required
                   placeholder="Nguyễn Văn A"
-                  value={form.full_name}
-                  onChange={set('full_name')}
-                  error={errors.full_name}
+                  value={form.candidate_name}
+                  onChange={set('candidate_name')}
+                  error={errors.candidate_name}
                   autoComplete="name"
                 />
 
