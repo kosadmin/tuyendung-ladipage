@@ -435,24 +435,20 @@ export default function ProjectDetailPage() {
         {/* ── HEADER CARD ─────────────────────────────────────────────── */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5">
 
-          {/* Tags */}
-          {tagList.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              {tagList.map(tag => (
-                <span key={tag} className={`${tagColor(tag)} text-[11px] font-black px-3 py-1 rounded-lg tracking-wide shadow-sm`}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+          {/* ── Phần trên: 2 cột trên PC, stack dọc trên mobile ── */}
+          <div className="flex flex-col lg:flex-row lg:gap-8 lg:items-start mb-4">
 
-          {/* PC: info trái + buttons phải | Mobile: stack dọc */}
-          <div className="flex flex-col lg:flex-row lg:gap-6 lg:items-start">
-
-            {/* ── Cột trái: info ── */}
-            <div className="flex-1 min-w-0">
-
-              {/* Logo + Tên dự án */}
+            {/* Cột trái: tags + logo + tên + địa chỉ */}
+            <div className="flex-1 min-w-0 mb-4 lg:mb-0">
+              {tagList.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {tagList.map(tag => (
+                    <span key={tag} className={`${tagColor(tag)} text-[11px] font-black px-3 py-1 rounded-lg tracking-wide shadow-sm`}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div className="flex gap-4 items-start mb-3">
                 <div className="flex-shrink-0 w-14 h-14 rounded-2xl border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden">
                   {project.icon_job
@@ -471,83 +467,20 @@ export default function ProjectDetailPage() {
                   )}
                 </div>
               </div>
-
-              {/* Địa chỉ */}
-              <div className="flex items-center gap-1.5 mb-4">
+              <div className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
                   <circle cx="12" cy="11" r="3"/>
                 </svg>
                 <span className="text-gray-500 text-[12px]">{addressFull}</span>
               </div>
-
-              {/* Metric pills */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-                {(project.salary_min || project.salary_max) && (
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                    <span className="text-base flex-shrink-0">💰</span>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Thu nhập</p>
-                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{formatSalaryShort(project.salary_min, project.salary_max)}</p>
-                    </div>
-                  </div>
-                )}
-                {project.hiring_form && (
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                    <span className="text-base flex-shrink-0">📋</span>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Hình thức</p>
-                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.hiring_form}</p>
-                    </div>
-                  </div>
-                )}
-                {ageLabel && (
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                    <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/>
-                    </svg>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Độ tuổi</p>
-                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{ageLabel}</p>
-                    </div>
-                  </div>
-                )}
-                {project.gender_required && (
-                  <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
-                    <span className="text-base flex-shrink-0">
-                      {project.gender_required.toLowerCase().includes('nữ') ? '👩' : project.gender_required.toLowerCase().includes('nam') ? '👨' : '⚤'}
-                    </span>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Giới tính</p>
-                      <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.gender_required}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Highlight */}
-              {project.highlight_info && (
-                <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
-                  <span>🎁</span>
-                  <p className="text-amber-700 font-bold text-[13px]">{project.highlight_info}</p>
-                </div>
-              )}
-
-              {/* Buttons — chỉ hiện trên mobile (PC dùng cột phải) */}
-              <div className="lg:hidden mt-4">
-                <ActionButtons
-                  incentiveLabel={incentiveLabel}
-                  onApply={() => setApply(true)}
-                  onRefer={() => setCtvOpen(true)}
-                />
-              </div>
             </div>
 
-            {/* ── Cột phải: buttons (chỉ PC) ── */}
-            <div className="hidden lg:flex flex-col gap-2.5 w-64 flex-shrink-0 pt-1">
+            {/* Cột phải: 2 nút — chỉ PC */}
+            <div className="hidden lg:flex flex-col gap-2.5 w-80 flex-shrink-0">
               <button
                 onClick={() => setApply(true)}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3.5
+                className="w-full flex items-center justify-center gap-2 px-6 py-4
                   bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
                   text-white font-black text-sm rounded-2xl
                   shadow-lg shadow-orange-200 hover:shadow-xl transition-all duration-200"
@@ -559,7 +492,7 @@ export default function ProjectDetailPage() {
               </button>
               <button
                 onClick={() => setCtvOpen(true)}
-                className="w-full flex items-center justify-center gap-2 px-5 py-3.5
+                className="w-full flex items-center justify-center gap-2 px-6 py-4
                   bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
                   text-white font-black text-sm rounded-2xl
                   shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
@@ -570,7 +503,68 @@ export default function ProjectDetailPage() {
                 Giới thiệu ứng viên · nhận {incentiveLabel}
               </button>
             </div>
+          </div>
 
+          {/* ── Phần dưới: pills + highlight + buttons mobile (full width) ── */}
+          <div className="border-t border-gray-100 pt-4 space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {(project.salary_min || project.salary_max) && (
+                <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                  <span className="text-base flex-shrink-0">💰</span>
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Thu nhập</p>
+                    <p className="text-[12px] font-bold text-gray-800 leading-snug">{formatSalaryShort(project.salary_min, project.salary_max)}</p>
+                  </div>
+                </div>
+              )}
+              {project.hiring_form && (
+                <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                  <span className="text-base flex-shrink-0">📋</span>
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Hình thức</p>
+                    <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.hiring_form}</p>
+                  </div>
+                </div>
+              )}
+              {ageLabel && (
+                <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                  <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/>
+                  </svg>
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Độ tuổi</p>
+                    <p className="text-[12px] font-bold text-gray-800 leading-snug">{ageLabel}</p>
+                  </div>
+                </div>
+              )}
+              {project.gender_required && (
+                <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+                  <span className="text-base flex-shrink-0">
+                    {project.gender_required.toLowerCase().includes('nữ') ? '👩' : project.gender_required.toLowerCase().includes('nam') ? '👨' : '⚤'}
+                  </span>
+                  <div>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Giới tính</p>
+                    <p className="text-[12px] font-bold text-gray-800 leading-snug">{project.gender_required}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {project.highlight_info && (
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
+                <span>🎁</span>
+                <p className="text-amber-700 font-bold text-[13px]">{project.highlight_info}</p>
+              </div>
+            )}
+
+            {/* Buttons mobile */}
+            <div className="lg:hidden">
+              <ActionButtons
+                incentiveLabel={incentiveLabel}
+                onApply={() => setApply(true)}
+                onRefer={() => setCtvOpen(true)}
+              />
+            </div>
           </div>
         </div>
 
