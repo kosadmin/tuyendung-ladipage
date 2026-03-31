@@ -438,19 +438,17 @@ export default function ApplyModal({
                 {/* Giới tính */}
                 <div>
                   <Label required>Giới tính</Label>
-                  <div className="flex gap-3">
-                    {['Nam', 'Nữ'].map(g => (
-                      <label key={g}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border cursor-pointer transition text-[13px] font-bold
-                          ${form.gender === g
-                            ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
-                            : 'bg-white text-gray-600 border-gray-200 hover:border-orange-300'}`}>
-                        <input type="radio" name="gender" value={g} checked={form.gender === g}
-                          onChange={set('gender')} className="sr-only" />
-                        {g === 'Nam' ? '👨' : '👩'} {g}
-                      </label>
-                    ))}
-                  </div>
+                  <select
+                    value={form.gender}
+                    onChange={set('gender')}
+                    className={`w-full px-3.5 py-2.5 rounded-xl border text-[13px] text-gray-800 bg-white outline-none transition
+                      focus:ring-2 focus:ring-orange-300 focus:border-orange-400
+                      ${errors.gender ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
+                  >
+                    <option value="">-- Chọn giới tính --</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                  </select>
                   <FieldError msg={errors.gender} />
                 </div>
 
