@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import SiteLayout from '@/components/SiteLayout';
 
-const ApplyModal = dynamic(() => import('@/components/ApplyModal'), { ssr: false });
+const CTVApplyModal = dynamic(() => import('@/components/CTVApplyModal'), { ssr: false });
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface CTVUser {
@@ -15,6 +15,7 @@ interface CTVUser {
   name: string;
   user_group: string;
   user_status: string | null;
+  ctv_type: string | null;
 }
 
 interface ProjectDetail {
@@ -205,7 +206,7 @@ export default function CTVProjectDetailPage() {
     (async () => {
       setLoading(true);
       const [ctvRes, projectRes] = await Promise.all([
-        supabase.from('users').select('user_id,name,user_group,user_status').eq('user_id', ctv_id).single(),
+        supabase.from('users').select('user_id,name,user_group,user_status,ctv_type').eq('user_id', ctv_id).single(),
         supabase.from('projects').select('*').eq('project_id', project_id).single(),
       ]);
 
@@ -430,7 +431,7 @@ export default function CTVProjectDetailPage() {
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
-                Ứng tuyển ngay
+                Đăng ký ứng viên
               </button>
             </div>
           </div>
@@ -496,7 +497,7 @@ export default function CTVProjectDetailPage() {
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
-                Ứng tuyển ngay
+                Đăng ký ứng viên
               </button>
             </div>
           </div>
@@ -536,23 +537,24 @@ export default function CTVProjectDetailPage() {
             <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
-            Ứng tuyển ngay
+            Đăng ký ứng viên
           </button>
         </div>
         <div className="lg:hidden h-20" aria-hidden="true"/>
       </div>
 
-      <ApplyModal
-        open={applyOpen}
-        onClose={() => setApply(false)}
-        company={project.company}
-        positions={positions}
-        projectId={project.project_id}
-        projectName={project.project}
-        projectType={project.project_type}
-        addressCity={project.address_city}
-        assignmentOverride={assignmentOverride}
-      />
+      <CTVApplyModal
+  open={applyOpen}
+  onClose={() => setApply(false)}
+  company={project.company}
+  positions={positions}
+  projectId={project.project_id}
+  projectName={project.project}
+  projectType={project.project_type}
+  addressCity={project.address_city}
+  assignmentOverride={assignmentOverride!}
+  ctvType={ctv?.ctv_type}
+/>
     </SiteLayout>
   );
 }
