@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import SiteLayout from '@/components/SiteLayout';
 
 const ApplyModal = dynamic(() => import('@/components/ApplyModal'), { ssr: false });
+const CTVModal   = dynamic(() => import('@/components/CTVModal'),   { ssr: false });
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface ProjectDetail {
@@ -15,7 +16,7 @@ interface ProjectDetail {
   project: string;
   project_type: string;
   company: string;
-  company_intro: string | null;       // ← thêm mới
+  company_intro: string | null;
   address_city: string;
   adress_full: string | null;
   map_link: string | null;
@@ -24,6 +25,7 @@ interface ProjectDetail {
   position: string | null;
   hiring_form: string | null;
   highlight_info: string | null;
+  incentive: number | null;             // ← thêm mới
   salary_min: number | null;
   salary_max: number | null;
   salary_detail: string | null;
@@ -34,7 +36,6 @@ interface ProjectDetail {
   deploy_end: string | null;
   interview_process: string | null;
   register_process: string | null;
-  // pickup_support: bỏ hiển thị (vẫn fetch nhưng không render)
   pickup_support: string | null;
   probation_info: string | null;
   warranty_period: string | null;
@@ -211,22 +212,49 @@ function MapCard({ mapLink, address }: { mapLink: string; address: string }) {
   );
 }
 
-// ── Apply Button ───────────────────────────────────────────────────────────
-function ApplyButton({ onClick }: { onClick: () => void }) {
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function formatIncentive(n: number | null): string {
+  const val = n ?? 1500000;
+  return val.toLocaleString('vi-VN') + ' đ';
+}
+
+// ── Action Buttons (Ứng tuyển + Giới thiệu) ───────────────────────────────
+function ActionButtons({
+  incentiveLabel,
+  onApply,
+  onRefer,
+}: {
+  incentiveLabel: string;
+  onApply: () => void;
+  onRefer: () => void;
+}) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5
-        bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
-        text-white font-black text-sm rounded-2xl
-        shadow-lg shadow-orange-200 hover:shadow-xl hover:shadow-orange-200/80
-        transition-all duration-200"
-    >
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-      </svg>
-      Ứng tuyển ngay
-    </button>
+    <div className="flex flex-col sm:flex-row gap-2.5">
+      <button
+        onClick={onApply}
+        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5
+          bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
+          text-white font-black text-sm rounded-2xl
+          shadow-lg shadow-orange-200 hover:shadow-xl transition-all duration-200"
+      >
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Ứng tuyển ngay
+      </button>
+      <button
+        onClick={onRefer}
+        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5
+          bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98]
+          text-white font-black text-sm rounded-2xl
+          shadow-lg shadow-emerald-200 hover:shadow-xl transition-all duration-200"
+      >
+        <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Giới thiệu · nhận {incentiveLabel}
+      </button>
+    </div>
   );
 }
 
@@ -238,6 +266,7 @@ export default function ProjectDetailPage() {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState<string | null>(null);
   const [applyOpen, setApply]   = useState(false);
+  const [ctvOpen, setCtvOpen]   = useState(false);
 
   useEffect(() => {
     if (!project_id) return;
@@ -275,7 +304,8 @@ export default function ProjectDetailPage() {
     </SiteLayout>
   );
 
-  const positions   = project.position?.split(',').map(p => p.trim()).filter(Boolean) ?? [];
+  const positions     = project.position?.split(',').map(p => p.trim()).filter(Boolean) ?? [];
+  const incentiveLabel = formatIncentive(project.incentive);
   const addressFull = project.adress_full || project.address_city;
   const ageLabel    = project.age_min && project.age_max
     ? `${project.age_min} – ${project.age_max} tuổi`
@@ -499,9 +529,13 @@ export default function ProjectDetailPage() {
             </div>
           )}
 
-          {/* ── Nút Ứng tuyển ngay ── */}
+          {/* ── Nút hành động ── */}
           <div className="pt-1">
-            <ApplyButton onClick={() => setApply(true)} />
+            <ActionButtons
+              incentiveLabel={incentiveLabel}
+              onApply={() => setApply(true)}
+              onRefer={() => setCtvOpen(true)}
+            />
           </div>
         </div>
 
@@ -516,11 +550,6 @@ export default function ProjectDetailPage() {
           </div>
           {/* RIGHT 1/3 */}
           <div className="space-y-4">
-            {/* Sticky apply button on desktop */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4">
-              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-3">Quan tâm vị trí này?</p>
-              <ApplyButton onClick={() => setApply(true)} />
-            </div>
             {project.map_link && (
               <div className="bg-white rounded-2xl border border-gray-100 p-4">
                 <MapCard mapLink={project.map_link} address={addressFull}/>
@@ -548,16 +577,39 @@ export default function ProjectDetailPage() {
           {SectionNote}
         </div>
 
-        {/* Mobile sticky apply bar */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 p-3 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-lg">
-          <ApplyButton onClick={() => setApply(true)} />
+        {/* Mobile sticky bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-30 px-3 py-3 bg-white/95 backdrop-blur-sm border-t border-gray-100 shadow-lg">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setApply(true)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3
+                bg-orange-500 hover:bg-orange-600 active:scale-[0.98]
+                text-white font-black text-[13px] rounded-xl shadow-md transition-all"
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              Ứng tuyển ngay
+            </button>
+            <button
+              onClick={() => setCtvOpen(true)}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3
+                bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98]
+                text-white font-black text-[13px] rounded-xl shadow-md transition-all"
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              Giới thiệu · {incentiveLabel}
+            </button>
+          </div>
         </div>
         {/* Padding để tránh bị che bởi sticky bar mobile */}
         <div className="lg:hidden h-20" aria-hidden="true"/>
 
       </div>
 
-      {/* Apply Modal */}
+      {/* Modals */}
       <ApplyModal
         open={applyOpen}
         onClose={() => setApply(false)}
@@ -568,6 +620,7 @@ export default function ProjectDetailPage() {
         projectType={project.project_type}
         addressCity={project.address_city}
       />
+      <CTVModal open={ctvOpen} onClose={() => setCtvOpen(false)} />
     </SiteLayout>
   );
 }
