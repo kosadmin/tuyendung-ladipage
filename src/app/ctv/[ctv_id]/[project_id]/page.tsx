@@ -363,22 +363,7 @@ export default function CTVProjectDetailPage() {
 
   return (
     <SiteLayout>
-      {/* Banner CTV */}
-      {ctv && (
-        <div style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f36a13 100%)' }}>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
-            </div>
-            <p className="text-white text-sm">
-              Bạn đang xem qua giới thiệu của{' '}
-              <span className="font-black">{ctv.name}</span>
-            </p>
-          </div>
-        </div>
-      )}
+    
 
       {/* Breadcrumb */}
       <div className="bg-white border-b">
