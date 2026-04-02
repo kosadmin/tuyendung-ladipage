@@ -40,31 +40,26 @@ const BENEFITS = [
 const STEPS = [
   {
     num: '01',
-    icon: '📝',
     title: 'Đăng ký tham gia',
     desc: 'Điền form đăng ký miễn phí. Nhận hỗ trợ từ đội ngũ K\u2011Outsourcing ngay sau đó.',
   },
   {
     num: '02',
-    icon: '🔍',
     title: 'Tìm ứng viên',
     desc: 'Tiếp cận những người đang có nhu cầu tìm việc xung quanh bạn.',
   },
   {
     num: '03',
-    icon: '📤',
     title: 'Nhập hồ sơ',
     desc: 'Điền thông tin ứng viên vào form trên website. Đội ngũ tư vấn sẽ chăm sóc tiếp.',
   },
   {
     num: '04',
-    icon: '📡',
     title: 'Theo dõi trạng thái',
     desc: 'Liên hệ nhân viên phụ trách để bám sát hành trình của ứng viên.',
   },
   {
     num: '05',
-    icon: '🎉',
     title: 'Nhận hoa hồng',
     desc: 'Ứng viên hoàn thành số ngày đi làm → bạn nhận hoa hồng vào ngày 15 hàng tháng.',
   },
