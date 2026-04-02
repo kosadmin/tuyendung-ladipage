@@ -5,23 +5,28 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen bg-gray-50">
 
     <header role="banner" className="sticky top-0 z-40 bg-white border-b shadow-sm">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-6">
     {/* Logo */}
     <Link href="/" aria-label="K-Outsourcing – Trang chủ">
       <img src="/logo.png" alt="K-Outsourcing logo" className="h-8 w-auto" width={120} height={32} />
     </Link>
- 
-    {/* Nav — chỉ hiển thị trên PC */}
+
+    {/* Nav */}
     <nav className="hidden lg:flex items-center gap-1" aria-label="Menu chính">
       <Link
         href="/cong-tac-vien"
-        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
+        className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
         Cộng tác viên
       </Link>
+      
+        href="https://koutsourcing.vn/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
+      >
+        Tin tức
+      </a>
     </nav>
   </div>
 </header>
