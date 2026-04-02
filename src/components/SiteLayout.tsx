@@ -13,21 +13,21 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
     {/* Nav */}
     <nav className="hidden lg:flex items-center gap-1" aria-label="Menu chính">
-      <Link
-        href="/cong-tac-vien"
-        className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
-      >
-        Cộng tác viên
-      </Link>
-      
-        href="https://koutsourcing.vn/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
-      >
-        Tin tức
-      </a>
-    </nav>
+  <Link
+    href="/cong-tac-vien"
+    className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
+  >
+    Cộng tác viên
+  </Link>
+  
+    href="https://koutsourcing.vn/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
+  >
+    Tin tức
+  </a>
+</nav>
   </div>
 </header>
 
