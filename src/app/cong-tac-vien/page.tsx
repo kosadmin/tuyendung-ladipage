@@ -149,7 +149,7 @@ export default function CTVPage() {
       ════════════════════════════════════════════════════ */}
       <section
         className="relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f97316 60%, #fb923c 100%)' }}
+        style={{ background: '#F06914' }}
       >
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-[360px] lg:min-h-[400px]">
 
@@ -165,7 +165,7 @@ export default function CTVPage() {
               Nhận hoa hồng hấp dẫn
             </p>
             <p className="text-white/80 text-[13px] leading-relaxed mb-6 max-w-sm">
-              Bạn biết ai đang tìm việc? Chỉ cần giới thiệu — K-Outsourcing sẽ lo phần còn lại và trả hoa hồng xứng đáng cho bạn.
+              Bạn biết ai đang tìm việc? Chỉ cần giới thiệu — <span className="whitespace-nowrap">K-Outsourcing</span> sẽ lo phần còn lại và trả hoa hồng xứng đáng cho bạn.
             </p>
             <div className="flex flex-col sm:flex-row items-start gap-2.5">
               <button
@@ -252,8 +252,8 @@ export default function CTVPage() {
       <section className="py-12 px-4 sm:px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-1">5 bước đơn giản để có</p>
-            <h2 className="text-xl sm:text-2xl font-black text-orange-500">THU NHẬP HẤP DẪN</h2>
+            <p className="text-gray-900 text-sm font-black uppercase tracking-widest mb-1">5 bước đơn giản để có</p>
+<h2 className="text-xl sm:text-2xl font-black text-orange-500">THU NHẬP HẤP DẪN</h2>
           </div>
 
           {/* Desktop — timeline ngang */}
@@ -317,27 +317,7 @@ export default function CTVPage() {
             ))}
           </div>
 
-          {/* Mini CTA bên dưới FAQ */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-500 text-[13px] mb-3">Còn thắc mắc? Liên hệ ngay với chúng tôi</p>
-            <div className="flex flex-col sm:flex-row gap-2.5 justify-center">
-              <button
-                onClick={() => setModalOpen(true)}
-                className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-xl shadow-md shadow-orange-200 transition-all active:scale-95"
-              >
-                Đăng ký làm Cộng tác viên →
-              </button>
-              <a
-                href="tel:0397013122"
-                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-sm hover:border-orange-300 hover:text-orange-600 transition-all"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                </svg>
-                Gọi: 0397.013.122
-              </a>
-            </div>
-          </div>
+    
         </div>
       </section>
 
@@ -351,7 +331,7 @@ export default function CTVPage() {
         <div className="group relative">
           {/* Tooltip bên trái */}
           <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <div className="bg-gray-900 text-white rounded-xl px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
+  <div className="bg-gray-900 text-white rounded-xl px-3 py-2 shadow-xl whitespace-nowrap">
               <p className="text-[10px] text-gray-400 leading-none mb-0.5">Liên hệ để được tư vấn chương trình CTV</p>
               <p className="text-orange-400 font-black text-sm">0397.013.122</p>
               <div className="absolute top-1/2 -translate-y-1/2 -right-[5px] w-2.5 h-2.5 bg-gray-900 rotate-45" />
