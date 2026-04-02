@@ -20,7 +20,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     Cộng tác viên
   </Link>
   
-    href="https://koutsourcing.vn/"
+    <a href="https://koutsourcing.vn/"
     target="_blank"
     rel="noopener noreferrer"
     className="px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all"
