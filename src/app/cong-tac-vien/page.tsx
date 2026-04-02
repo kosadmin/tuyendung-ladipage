@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 const CTVModal = dynamic(() => import('@/components/CTVModal'), { ssr: false });
 
 // ── Data ───────────────────────────────────────────────────────────────────
+// \u2011 = non-breaking hyphen → "K-Outsourcing" sẽ không bị rớt dòng tại dấu gạch nối
 const BENEFITS = [
   {
     icon: '💰',
@@ -27,12 +28,12 @@ const BENEFITS = [
   {
     icon: '📊',
     title: 'Tiện lợi – Minh bạch',
-    desc: 'Theo dõi trạng thái ứng viên và hoa hồng mọi lúc, mọi nơi qua hệ thống.',
+    desc: 'Đăng ký ứng viên mọi lúc, mọi nơi qua hệ thống.',
   },
   {
     icon: '🤝',
     title: 'Hỗ trợ tận tình',
-    desc: 'Đội ngũ chuyên viên K-Outsourcing luôn sẵn sàng hướng dẫn và đồng hành cùng bạn.',
+    desc: 'Đội ngũ chuyên viên K\u2011Outsourcing luôn sẵn sàng hướng dẫn và đồng hành cùng bạn.',
   },
 ];
 
@@ -41,59 +42,31 @@ const STEPS = [
     num: '01',
     icon: '📝',
     title: 'Đăng ký tham gia',
-    desc: 'Điền thông tin đăng ký, hoàn toàn miễn phí. Nhận hướng dẫn từ đội ngũ K-Outsourcing ngay sau khi đăng ký.',
+    desc: 'Điền form đăng ký miễn phí. Nhận hỗ trợ từ đội ngũ K\u2011Outsourcing ngay sau đó.',
   },
   {
     num: '02',
     icon: '🔍',
     title: 'Tìm ứng viên',
-    desc: 'Tìm kiếm và tiếp cận những người đang có nhu cầu tìm việc làm xung quanh bạn.',
+    desc: 'Tiếp cận những người đang có nhu cầu tìm việc xung quanh bạn.',
   },
   {
     num: '03',
     icon: '📤',
-    title: 'Nhập hồ sơ lên hệ thống',
-    desc: 'Điền thông tin ứng viên vào form ứng tuyển trên website. Đội ngũ tư vấn sẽ chăm sóc ứng viên cho bạn.',
+    title: 'Nhập hồ sơ',
+    desc: 'Điền thông tin ứng viên vào form trên website. Đội ngũ tư vấn sẽ chăm sóc tiếp.',
   },
   {
     num: '04',
     icon: '📡',
     title: 'Theo dõi trạng thái',
-    desc: 'Liên hệ với nhân viên K-Outsourcing để bám sát hành trình của ứng viên trong quá trình tuyển dụng.',
+    desc: 'Liên hệ nhân viên phụ trách để bám sát hành trình của ứng viên.',
   },
   {
     num: '05',
     icon: '🎉',
     title: 'Nhận hoa hồng',
-    desc: 'Ứng viên vượt qua thử việc → bạn nhận hoa hồng. Thanh toán đúng hạn, minh bạch, rõ ràng.',
-  },
-];
-
-const REASONS = [
-  {
-    icon: '🆓',
-    title: 'Cam kết hoàn toàn miễn phí',
-    desc: 'Không phải đóng bất kỳ chi phí nào để trở thành Cộng tác viên của K-Outsourcing.',
-  },
-  {
-    icon: '🎓',
-    title: 'Được đào tạo bài bản',
-    desc: 'Miễn phí đào tạo, tư vấn kiến thức và kỹ năng để tìm kiếm và giới thiệu ứng viên hiệu quả.',
-  },
-  {
-    icon: '🖥️',
-    title: 'Quản lý dễ dàng',
-    desc: 'Theo dõi hồ sơ ứng viên, trạng thái tuyển dụng và hoa hồng từng đơn hàng trực quan.',
-  },
-  {
-    icon: '💬',
-    title: 'Hỗ trợ xuyên suốt',
-    desc: 'Nhân viên tư vấn K-Outsourcing hỗ trợ chăm sóc từng ứng viên trong toàn bộ hành trình tuyển dụng.',
-  },
-  {
-    icon: '✅',
-    title: 'Hoa hồng minh bạch, đúng hạn',
-    desc: 'Cam kết chi trả hoa hồng đúng hẹn, đúng số tiền đã thỏa thuận, không phát sinh phức tạp.',
+    desc: 'Ứng viên hoàn thành số ngày đi làm → bạn nhận hoa hồng vào ngày 15 hàng tháng.',
   },
 ];
 
@@ -108,11 +81,11 @@ const FAQS = [
   },
   {
     q: 'Cộng tác viên nhận hoa hồng bao nhiêu mỗi ứng viên?',
-    a: 'Mức hoa hồng phụ thuộc vào từng vị trí tuyển dụng, dao động từ 500.000đ đến vài triệu đồng/ứng viên. Chi tiết được thông báo sau khi bạn đăng ký.',
+    a: 'Mức hoa hồng phụ thuộc vào vị trí tuyển dụng và thời gian ứng viên đi làm thực tế, tối thiểu 1.500.000đ / ứng viên. Thông tin chi tiết mức hoa hồng từng vị trí sẽ được thông báo sau khi bạn đăng ký nhé.',
   },
   {
     q: 'Ứng viên phải đi làm bao lâu thì tôi nhận được hoa hồng?',
-    a: 'Ứng viên cần hoàn thành thời gian thử việc theo quy định của từng doanh nghiệp (thường 30–60 ngày) thì hoa hồng mới được xác nhận và thanh toán.',
+    a: 'Tùy vào từng dự án, mức hoa hồng sẽ căn cứ theo số ngày đi làm thực tế của ứng viên và được chi trả cho cộng tác viên vào ngày 15 hàng tháng.',
   },
   {
     q: 'Tôi có thể giới thiệu bao nhiêu ứng viên?',
@@ -120,15 +93,15 @@ const FAQS = [
   },
   {
     q: 'Hoa hồng được thanh toán qua hình thức nào?',
-    a: 'Hoa hồng được chuyển khoản ngân hàng trực tiếp đến tài khoản của bạn sau khi ứng viên được xác nhận hoàn thành thử việc.',
+    a: 'Hoa hồng được chuyển khoản ngân hàng trực tiếp đến tài khoản của bạn vào ngày 15 hàng tháng.',
   },
   {
     q: 'Tôi theo dõi tình trạng ứng viên đã giới thiệu ở đâu?',
-    a: 'Bạn có thể liên hệ trực tiếp với nhân viên tư vấn K-Outsourcing được giao phụ trách để cập nhật tình trạng ứng viên bất kỳ lúc nào.',
+    a: 'Bạn có thể liên hệ trực tiếp với nhân viên tư vấn K-Outsourcing phụ trách để cập nhật tình trạng ứng viên bất kỳ lúc nào.',
   },
 ];
 
-// ── FAQ Item (accordion) ───────────────────────────────────────────────────
+// ── FAQ Accordion ──────────────────────────────────────────────────────────
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -142,13 +115,15 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left"
         aria-expanded={open}
       >
-        <span className={`font-bold text-[14px] leading-snug ${open ? 'text-orange-700' : 'text-gray-800'}`}>{q}</span>
+        <span className={`font-bold text-[14px] leading-snug ${open ? 'text-orange-700' : 'text-gray-800'}`}>
+          {q}
+        </span>
         <span
-          className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 ${
+          className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${
             open ? 'bg-orange-500 text-white rotate-45' : 'bg-gray-100 text-gray-500'
           }`}
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
         </span>
@@ -168,93 +143,103 @@ export default function CTVPage() {
 
   return (
     <SiteLayout>
+
       {/* ════════════════════════════════════════════════════
-          HERO
+          SECTION 1 — HERO (2 cột)
       ════════════════════════════════════════════════════ */}
       <section
         className="relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f97316 50%, #fb923c 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f97316 60%, #fb923c 100%)' }}
       >
-        {/* Decorative circles */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/5 pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-60 h-60 rounded-full bg-white/5 pointer-events-none" />
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-[360px] lg:min-h-[400px]">
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 lg:py-20 flex flex-col lg:flex-row items-center gap-10">
-          {/* Left */}
-          <div className="flex-1 text-center lg:text-left">
-            <span className="inline-block px-4 py-1.5 rounded-full border border-white/40 text-white/90 text-[11px] font-bold uppercase tracking-widest mb-5">
+          {/* Cột trái — text + buttons */}
+          <div className="flex flex-col justify-center px-6 sm:px-8 lg:px-10 py-10 lg:py-12">
+            <span className="inline-block px-3 py-1 rounded-full border border-white/40 text-white/90 text-[10px] font-bold uppercase tracking-widest mb-4 w-fit">
               Chương trình Cộng tác viên
             </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-3">
+            <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-1">
               Giới thiệu ứng viên
             </h1>
-            <p className="text-3xl sm:text-4xl lg:text-5xl font-black text-amber-200 leading-tight mb-6">
+            <p className="text-2xl sm:text-3xl font-black text-amber-200 leading-tight mb-4">
               Nhận hoa hồng hấp dẫn
             </p>
-            <p className="text-white/80 text-[15px] leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
+            <p className="text-white/80 text-[13px] leading-relaxed mb-6 max-w-sm">
               Bạn biết ai đang tìm việc? Chỉ cần giới thiệu — K-Outsourcing sẽ lo phần còn lại và trả hoa hồng xứng đáng cho bạn.
             </p>
-            <div className="flex flex-col sm:flex-row items-center gap-3 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row items-start gap-2.5">
               <button
                 onClick={() => setModalOpen(true)}
-                className="w-full sm:w-auto px-8 py-4 bg-white text-orange-600 font-black text-sm rounded-2xl shadow-xl hover:shadow-2xl hover:bg-orange-50 transition-all active:scale-95"
+                className="w-full sm:w-auto px-6 py-2.5 bg-white text-orange-600 font-black text-sm rounded-xl shadow-lg hover:bg-orange-50 transition-all active:scale-95"
               >
                 Đăng ký tham gia miễn phí →
               </button>
               <a
-                href="tel:03252772922"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-4 rounded-2xl border-2 border-white/30 text-white font-bold text-sm hover:bg-white/10 transition-all"
+                href="tel:0325277292"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-white/40 text-white font-bold text-sm hover:bg-white/10 transition-all"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                 </svg>
                 Tư vấn: 0325 277 292
               </a>
             </div>
           </div>
 
-          {/* Right — stat cards */}
-          <div className="flex-shrink-0 w-full lg:w-auto">
-            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto lg:mx-0">
-              {[
-                { value: '1.500.000đ', label: 'Hoa hồng trung bình/ứng viên', icon: '💵' },
-                { value: 'Không giới hạn', label: 'Số ứng viên giới thiệu', icon: '♾️' },
-                { value: '60+', label: 'Doanh nghiệp đang tuyển', icon: '🏭' },
-                { value: 'Miễn phí 100%', label: 'Tham gia chương trình', icon: '🎁' },
-              ].map((s, i) => (
-                <div key={i} className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20 text-center">
-                  <div className="text-2xl mb-1">{s.icon}</div>
-                  <p className="text-white font-black text-[15px] leading-tight">{s.value}</p>
-                  <p className="text-white/70 text-[10px] mt-1 leading-snug">{s.label}</p>
-                </div>
-              ))}
-            </div>
+          {/* Cột phải — hình ctv_solo.png, full, không bo góc/khung */}
+          <div className="hidden lg:flex items-end justify-center overflow-hidden">
+            <img
+              src="/banners/ctv_solo.png"
+              alt="Cộng tác viên K-Outsourcing"
+              className="max-h-[400px] w-auto object-contain object-bottom"
+            />
           </div>
+
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════
-          BENEFITS — 5 cards
+          SECTION 2 — 5 LÝ DO
+          Desktop: 5 cards  |  Mobile: 5 thanh ngang
       ════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4 sm:px-6 bg-white">
+      <section className="py-12 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">
-              Tại sao nên trở thành CTV K-Outsourcing?
+          <div className="text-center mb-8">
+            <h2 className="text-xl sm:text-2xl font-black text-gray-900">
+              5 lý do bạn nên trở thành Cộng tác viên của K-Outsourcing
             </h2>
-            <p className="text-gray-500 text-[14px]">5 lý do khiến hàng nghìn người đã và đang tham gia</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+          {/* Desktop: 5 cards */}
+          <div className="hidden sm:grid grid-cols-5 gap-3">
             {BENEFITS.map((b, i) => (
               <div
                 key={i}
-                className="flex flex-col items-center text-center p-5 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg hover:shadow-orange-50 transition-all duration-200 group"
+                className="flex flex-col items-center text-center p-4 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-md hover:shadow-orange-50/80 transition-all duration-200 group"
               >
-                <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-2xl mb-4 group-hover:bg-orange-100 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-xl mb-3 group-hover:bg-orange-100 transition-colors">
                   {b.icon}
                 </div>
-                <h3 className="font-black text-gray-900 text-[14px] mb-2 leading-snug">{b.title}</h3>
-                <p className="text-gray-500 text-[12px] leading-relaxed">{b.desc}</p>
+                <h3 className="font-black text-gray-900 text-[13px] mb-1.5 leading-snug">{b.title}</h3>
+                <p className="text-gray-500 text-[11px] leading-relaxed">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile: 5 thanh ngang */}
+          <div className="sm:hidden space-y-2.5">
+            {BENEFITS.map((b, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-gray-100 bg-white hover:border-orange-200 transition-all"
+              >
+                <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-lg flex-shrink-0">
+                  {b.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-black text-gray-900 text-[13px] leading-snug">{b.title}</p>
+                  <p className="text-gray-500 text-[11px] leading-relaxed mt-0.5">{b.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -262,146 +247,135 @@ export default function CTVPage() {
       </section>
 
       {/* ════════════════════════════════════════════════════
-          STEPS — 5 bước đơn giản
+          SECTION 3 — 5 BƯỚC HÀNH TRÌNH (ngang trên desktop)
       ════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4 sm:px-6 bg-gray-50">
+      <section className="py-12 px-4 sm:px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left — text */}
-            <div>
-              <p className="text-gray-500 text-[13px] font-bold uppercase tracking-widest mb-2">5 bước đơn giản để có</p>
-              <h2 className="text-3xl sm:text-4xl font-black text-orange-500 leading-tight mb-8">
-                THU NHẬP HẤP DẪN
-              </h2>
-              <div className="space-y-3">
+          <div className="text-center mb-10">
+            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-1">5 bước đơn giản để có</p>
+            <h2 className="text-xl sm:text-2xl font-black text-orange-500">THU NHẬP HẤP DẪN</h2>
+          </div>
+
+          {/* Desktop — timeline ngang */}
+          <div className="hidden sm:block">
+            <div className="relative">
+              {/* Đường kết nối các bước */}
+              <div
+                className="absolute h-px bg-gradient-to-r from-orange-100 via-orange-300 to-orange-100 pointer-events-none"
+                style={{ top: '28px', left: 'calc(10% + 28px)', right: 'calc(10% + 28px)' }}
+              />
+              <div className="grid grid-cols-5 gap-4 relative">
                 {STEPS.map((s, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-4 bg-white rounded-2xl border border-gray-100 px-4 py-4 hover:border-orange-100 hover:shadow-sm transition-all"
-                  >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black text-[13px]">
+                  <div key={i} className="flex flex-col items-center text-center px-2">
+                    <div className="relative z-10 w-14 h-14 rounded-full bg-orange-500 text-white font-black text-base flex items-center justify-center mb-3 ring-4 ring-gray-50 shadow-md shadow-orange-100">
                       {s.num}
                     </div>
-                    <div>
-                      <p className="font-bold text-orange-600 text-[13px] mb-0.5">{s.title}</p>
-                      <p className="text-gray-500 text-[12px] leading-relaxed">{s.desc}</p>
-                    </div>
+                    <span className="text-xl mb-2">{s.icon}</span>
+                    <p className="font-black text-orange-600 text-[12px] leading-snug mb-1">{s.title}</p>
+                    <p className="text-gray-500 text-[11px] leading-relaxed">{s.desc}</p>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Right — visual */}
-            <div className="hidden lg:block">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-orange-100">
-                <img
-                  src="/banners/ctv_banner.png"
-                  alt="Cộng tác viên K-Outsourcing"
-                  className="w-full object-cover"
-                  style={{ aspectRatio: '3/2' }}
-                />
-                {/* Overlay badge */}
-                <div className="absolute bottom-4 left-4 right-4">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 flex items-center gap-3 shadow-lg">
-                    <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white text-lg flex-shrink-0">
-                      💰
-                    </div>
-                    <div>
-                      <p className="font-black text-gray-900 text-[13px]">Thu nhập không giới hạn</p>
-                      <p className="text-gray-500 text-[11px]">Làm bất kỳ lúc nào, bất kỳ đâu</p>
-                    </div>
+          {/* Mobile — timeline dọc */}
+          <div className="sm:hidden">
+            {STEPS.map((s, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="flex flex-col items-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-orange-500 text-white font-black text-sm flex items-center justify-center ring-2 ring-gray-50 shadow-sm">
+                    {s.num}
                   </div>
+                  {i < STEPS.length - 1 && <div className="w-0.5 h-6 bg-orange-200 mt-1" />}
+                </div>
+                <div className="pb-5">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="text-base">{s.icon}</span>
+                    <p className="font-bold text-orange-600 text-[13px]">{s.title}</p>
+                  </div>
+                  <p className="text-gray-500 text-[12px] leading-relaxed">{s.desc}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════
+          SECTION 4 — FAQ
+      ════════════════════════════════════════════════════ */}
+      <section className="py-12 px-4 sm:px-6 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-xl sm:text-2xl font-black text-gray-900 mb-1">Câu hỏi thường gặp</h2>
+            <p className="text-gray-400 text-[13px]">Những thắc mắc phổ biến nhất về chương trình CTV</p>
+          </div>
+          <div className="space-y-2.5">
+            {FAQS.map((f, i) => (
+              <FaqItem key={i} q={f.q} a={f.a} />
+            ))}
+          </div>
+
+          {/* Mini CTA bên dưới FAQ */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-500 text-[13px] mb-3">Còn thắc mắc? Liên hệ ngay với chúng tôi</p>
+            <div className="flex flex-col sm:flex-row gap-2.5 justify-center">
+              <button
+                onClick={() => setModalOpen(true)}
+                className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-xl shadow-md shadow-orange-200 transition-all active:scale-95"
+              >
+                Đăng ký làm Cộng tác viên →
+              </button>
+              <a
+                href="tel:0397013122"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold text-sm hover:border-orange-300 hover:text-orange-600 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+                Gọi: 0397.013.122
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════
-          REASONS — dark section
+          FLOATING PHONE — cố định bên phải, 75% từ trên xuống
       ════════════════════════════════════════════════════ */}
-      <section
-        className="py-16 px-4 sm:px-6"
-        style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%)' }}
+      <div
+        className="fixed right-4 z-50"
+        style={{ top: '75%', transform: 'translateY(-50%)' }}
       >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">
-              Kiếm tiền dễ dàng cùng K-Outsourcing
-            </h2>
-            <p className="text-white/50 text-[13px]">Chúng tôi cam kết đồng hành với bạn từ bước đầu tiên</p>
+        <div className="group relative">
+          {/* Tooltip bên trái */}
+          <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="bg-gray-900 text-white rounded-xl px-3 py-2 shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-1 group-hover:translate-x-0 whitespace-nowrap">
+              <p className="text-[10px] text-gray-400 leading-none mb-0.5">Liên hệ để được tư vấn chương trình CTV</p>
+              <p className="text-orange-400 font-black text-sm">0397.013.122</p>
+              <div className="absolute top-1/2 -translate-y-1/2 -right-[5px] w-2.5 h-2.5 bg-gray-900 rotate-45" />
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            {REASONS.slice(0, 3).map((r, i) => (
-              <div key={i} className="bg-white/8 backdrop-blur-sm rounded-2xl border border-white/10 p-6 text-center hover:bg-white/12 transition-all">
-                <div className="text-3xl mb-3">{r.icon}</div>
-                <h3 className="font-black text-white text-[14px] mb-2">{r.title}</h3>
-                <p className="text-white/60 text-[12px] leading-relaxed">{r.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-            {REASONS.slice(3).map((r, i) => (
-              <div key={i} className="bg-white/8 backdrop-blur-sm rounded-2xl border border-white/10 p-6 text-center hover:bg-white/12 transition-all">
-                <div className="text-3xl mb-3">{r.icon}</div>
-                <h3 className="font-black text-white text-[14px] mb-2">{r.title}</h3>
-                <p className="text-white/60 text-[12px] leading-relaxed">{r.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ════════════════════════════════════════════════════
-          FAQ
-      ════════════════════════════════════════════════════ */}
-      <section className="py-16 px-4 sm:px-6 bg-gray-50">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-2">Câu hỏi thường gặp</h2>
-            <p className="text-gray-500 text-[14px]">Những thắc mắc phổ biến nhất về chương trình CTV</p>
-          </div>
-          <div className="space-y-3">
-            {FAQS.map((f, i) => (
-              <FaqItem key={i} q={f.q} a={f.a} />
-            ))}
-          </div>
-        </div>
-      </section>
+          {/* Nút */}
+          <a
+            href="tel:0397013122"
+            aria-label="Gọi tư vấn CTV: 0397 013 122"
+            className="relative z-10 w-12 h-12 bg-orange-500 hover:bg-orange-600 rounded-full flex items-center justify-center shadow-lg shadow-orange-300/50 transition-all hover:scale-110 active:scale-95"
+          >
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+          </a>
 
-      {/* ════════════════════════════════════════════════════
-          FINAL CTA
-      ════════════════════════════════════════════════════ */}
-      <section
-        className="py-16 px-4 sm:px-6"
-        style={{ background: 'linear-gradient(135deg, #ea6715 0%, #f97316 100%)' }}
-      >
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">
-            Sẵn sàng bắt đầu kiếm tiền?
-          </h2>
-          <p className="text-white/80 text-[14px] mb-8 leading-relaxed">
-            Đăng ký ngay hôm nay — hoàn toàn miễn phí, nhận hỗ trợ tận tình từ đội ngũ K-Outsourcing.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => setModalOpen(true)}
-              className="px-10 py-4 bg-white text-orange-600 font-black text-sm rounded-2xl shadow-xl hover:bg-orange-50 transition-all active:scale-95"
-            >
-              Đăng ký làm Cộng tác viên ngay →
-            </button>
-            <Link
-              href="/"
-              className="px-8 py-4 rounded-2xl border-2 border-white/30 text-white font-bold text-sm hover:bg-white/10 transition-all text-center"
-            >
-              Xem danh sách việc làm
-            </Link>
-          </div>
+          {/* Pulse ring */}
+          <span className="absolute inset-0 rounded-full bg-orange-400 animate-ping opacity-20 pointer-events-none" />
         </div>
-      </section>
+      </div>
 
       <CTVModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
     </SiteLayout>
   );
 }
