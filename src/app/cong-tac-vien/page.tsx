@@ -265,7 +265,6 @@ export default function CTVPage() {
                     <div className="relative z-10 w-14 h-14 rounded-full bg-orange-500 text-white font-black text-base flex items-center justify-center mb-3 ring-4 ring-gray-50 shadow-md shadow-orange-100">
                       {s.num}
                     </div>
-                    <span className="text-xl mb-2">{s.icon}</span>
                     <p className="font-black text-orange-600 text-[12px] leading-snug mb-1">{s.title}</p>
                     <p className="text-gray-500 text-[11px] leading-relaxed">{s.desc}</p>
                   </div>
