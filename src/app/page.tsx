@@ -784,11 +784,12 @@ const toggleAge = (key: string) => {
                       </li>
                     ))}
 </ul>
-                  <button
-                    onClick={() => setCtvOpen(true)}
-                    className="w-full sm:w-auto px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-orange-200 transition-all hover:shadow-xl active:scale-95">
-                    Đăng ký làm Cộng tác viên ngay →
-                  </button>
+                  <Link
+  href="/cong-tac-vien"
+  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-orange-200 transition-all hover:shadow-xl active:scale-95"
+>
+  Đăng ký làm Cộng tác viên ngay →
+</Link>
                 </div>
 <div className="rounded-2xl overflow-hidden shadow-xl bg-orange-50">
   <img
