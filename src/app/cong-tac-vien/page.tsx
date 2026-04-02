@@ -285,7 +285,6 @@ export default function CTVPage() {
                 </div>
                 <div className="pb-5">
                   <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-base">{s.icon}</span>
                     <p className="font-bold text-orange-600 text-[13px]">{s.title}</p>
                   </div>
                   <p className="text-gray-500 text-[12px] leading-relaxed">{s.desc}</p>
