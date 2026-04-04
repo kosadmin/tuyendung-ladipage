@@ -261,7 +261,7 @@ export default function ApplyModal({
   addressCity,
   assignmentOverride,         // ← THÊM
 }: ApplyModalProps) {
-  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwCRMgc3rqlSyZFSvsXCd0vtwVWp8UjJRz4gwjFb7LpLnP-3CKJPd8C0iAHfSx8MYHJ/exec';
+  const ENDPOINT = process.env.NEXT_PUBLIC_APPLY_SHEET_ENDPOINT ?? '';
 
   const [form, setForm] = useState<FormData>({
     candidate_name: '',
