@@ -244,18 +244,15 @@ function ActionButtons({
         </svg>
         Ứng tuyển ngay
       </button>
-      <button
-        onClick={onRefer}
-        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5
-          bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
-          text-white font-black text-sm rounded-2xl
-          shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
+      <Link
+        href="/cong-tac-vien"
+        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
       >
         <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
         Giới thiệu ứng viên · nhận {incentiveLabel}
-      </button>
+      </Link>
     </div>
   );
 }
@@ -490,18 +487,15 @@ export default function ProjectDetailPage() {
                 </svg>
                 Ứng tuyển ngay
               </button>
-              <button
-                onClick={() => setCtvOpen(true)}
-                className="w-full flex items-center justify-center gap-2 px-6 py-4
-                  bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
-                  text-white font-black text-sm rounded-2xl
-                  shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
-              >
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                Giới thiệu ứng viên · nhận {incentiveLabel}
-              </button>
+              <Link
+    href="/cong-tac-vien"
+    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-200 hover:shadow-xl transition-all duration-200"
+  >
+    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+    Giới thiệu ứng viên · nhận {incentiveLabel}
+  </Link>
             </div>
           </div>
 
@@ -620,17 +614,15 @@ export default function ProjectDetailPage() {
               </svg>
               Ứng tuyển ngay
             </button>
-            <button
-              onClick={() => setCtvOpen(true)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-3
-                bg-blue-500 hover:bg-blue-600 active:scale-[0.98]
-                text-white font-black text-[13px] rounded-xl shadow-md transition-all"
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              Giới thiệu · {incentiveLabel}
-            </button>
+            <Link
+      href="/cong-tac-vien"
+      className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white font-black text-[13px] rounded-xl shadow-md transition-all"
+    >
+      <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      Giới thiệu · {incentiveLabel}
+    </Link>
           </div>
         </div>
         {/* Padding để tránh bị che bởi sticky bar mobile */}
