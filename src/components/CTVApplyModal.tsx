@@ -13,12 +13,14 @@ const PROVINCES = [
 ];
 
 const EDUCATION_LEVELS = [
-  "Chưa tốt nghiệp THPT",
-  "Tốt nghiệp THPT",
-  "Trung cấp / Nghề",
+  "Tiểu học",
+  "PTCS",
+  "PTTH",
+  "Trung cấp",
   "Cao đẳng",
   "Đại học",
-  "Sau đại học",
+  "Thạc sĩ",
+  "Tiến sĩ",
 ];
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -61,8 +63,9 @@ interface FormErrors {
   gender?: string;
   date_of_birth?: string;
   phone?: string;
+  id_card_number?: string;
+  address_city?: string;
   position?: string;
-  interview_date?: string;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -80,8 +83,9 @@ function validateForm(data: FormData): FormErrors {
   } else if (!validatePhone(data.phone)) {
     errors.phone = 'Số điện thoại phải có 10 chữ số, bắt đầu bằng 0';
   }
-  if (!data.position)       errors.position       = 'Vui lòng chọn vị trí ứng tuyển';
-  if (!data.interview_date) errors.interview_date = 'Vui lòng chọn ngày phỏng vấn';
+  if (!data.id_card_number.trim()) errors.id_card_number = 'Vui lòng nhập số CCCD / CMND';
+  if (!data.address_city)          errors.address_city   = 'Vui lòng chọn tỉnh / thành phố';
+  if (!data.position)              errors.position       = 'Vui lòng chọn vị trí ứng tuyển';
   return errors;
 }
 
@@ -135,8 +139,6 @@ export default function CTVApplyModal({
   assignmentOverride,
   ctvType,
 }: CTVApplyModalProps) {
-  // Endpoint riêng cho form CTV — deploy Apps Script mới rồi điền vào .env.local
-  // NEXT_PUBLIC_CTV_APPLY_SHEET_ENDPOINT=https://script.google.com/macros/s/YOUR_ID/exec
   const ENDPOINT = process.env.NEXT_PUBLIC_CTV_APPLY_SHEET_ENDPOINT ?? '';
 
   const makeEmpty = (): FormData => ({
@@ -206,17 +208,14 @@ export default function CTVApplyModal({
 
     const timestamp = new Date().toISOString();
 
-    // Tính birth_year từ date_of_birth
     const birth_year = form.date_of_birth
       ? new Date(form.date_of_birth).getFullYear()
       : '';
 
-    // Ghép address_full: Số nhà - Phường/Xã - Tỉnh/TP
     const address_full = [form.address_street, form.address_ward, form.address_city]
       .filter(Boolean)
       .join(' - ');
 
-    // Logic data_source theo user_group của CTV
     const isVendor = assignmentOverride.assigned_user_group === 'vendor';
     const data_source_dept       = isVendor ? 'Quản lý nguồn' : 'Tuyển dụng';
     const data_source_type_group = isVendor ? 'Vendor/CTV'     : 'Seeding';
@@ -226,51 +225,32 @@ export default function CTVApplyModal({
       created_at:              timestamp,
       last_updated_at:         timestamp,
       created_by:              'KOSAD',
-
-      // Thông tin cá nhân
       candidate_name:          form.candidate_name.trim(),
       gender:                  form.gender,
       date_of_birth:           form.date_of_birth,
       birth_year,
       phone:                   form.phone.trim(),
-
-      // CCCD / CMND
       id_card_number:          form.id_card_number.trim(),
       id_card_issued_date:     form.id_card_issued_date,
       id_card_issued_place:    form.id_card_issued_place.trim(),
-
-      // Địa chỉ
       address_street:          form.address_street.trim(),
       address_ward:            form.address_ward.trim(),
       address_city:            form.address_city,
       address_full,
-
-      // Học vấn
       education_level:         form.education_level,
-
-      // Ứng tuyển
       company:                 form.company,
       position:                form.position,
       project_id:              projectId,
       project:                 projectName,
       project_type:            projectType,
-
-      // Lịch phỏng vấn
       interview_date:          form.interview_date,
-
       take_note:               '',
-
-      // Assignment — lấy từ CTV
       assigned_user:           assignmentOverride.assigned_user,
       assigned_user_name:      assignmentOverride.assigned_user_name,
       assigned_user_group:     assignmentOverride.assigned_user_group,
-
-      // Data source — tính theo user_group
       data_source_dept,
       data_source_type_group,
       data_source_type,
-
-      // Trạng thái pipeline
       new:                     true,
       interested:              true,
       scheduled_for_interview: true,
@@ -310,7 +290,7 @@ export default function CTVApplyModal({
     >
       <div className="relative w-full sm:max-w-lg bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[95dvh]">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
           <div>
             <h2 className="font-black text-gray-900 text-xl">Đăng ký ứng viên</h2>
@@ -325,11 +305,10 @@ export default function CTVApplyModal({
           </button>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         <div className="overflow-y-auto flex-1 px-5 py-5">
 
           {submitted ? (
-            /* ── Thành công ── */
             <div className="flex flex-col items-center justify-center py-10 text-center gap-4">
               <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
                 <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -343,10 +322,7 @@ export default function CTVApplyModal({
                   Chúng tôi sẽ liên hệ trong thời gian sớm nhất.
                 </p>
               </div>
-              <button
-                onClick={onClose}
-                className="mt-2 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition text-sm"
-              >
+              <button onClick={onClose} className="mt-2 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition text-sm">
                 Đóng
               </button>
             </div>
@@ -394,9 +370,10 @@ export default function CTVApplyModal({
               <SectionTitle>CCCD / CMND</SectionTitle>
 
               <InputField
-                label="Số CCCD / CMND"
+                label="Số CCCD / CMND" required
                 placeholder="012345678901"
                 value={form.id_card_number} onChange={set('id_card_number')}
+                error={errors.id_card_number}
                 inputMode="numeric"
               />
 
@@ -429,14 +406,17 @@ export default function CTVApplyModal({
               />
 
               <div>
-                <Label>Tỉnh / Thành phố</Label>
+                <Label required>Tỉnh / Thành phố</Label>
                 <select
                   value={form.address_city} onChange={set('address_city')}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[13px] text-gray-800 bg-white outline-none transition focus:ring-2 focus:ring-orange-300 focus:border-orange-400 hover:border-gray-300"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-[13px] text-gray-800 bg-white outline-none transition
+                    focus:ring-2 focus:ring-orange-300 focus:border-orange-400
+                    ${errors.address_city ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}
                 >
                   <option value="">-- Chọn tỉnh / thành phố --</option>
                   {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
+                <FieldError msg={errors.address_city} />
               </div>
 
               {/* 4. Trình độ học vấn */}
@@ -487,9 +467,9 @@ export default function CTVApplyModal({
               <SectionTitle>Lịch phỏng vấn</SectionTitle>
 
               <InputField
-                label="Ngày phỏng vấn" required type="date"
+                label="Ngày phỏng vấn"
+                type="date"
                 value={form.interview_date} onChange={set('interview_date')}
-                error={errors.interview_date}
                 min={today}
               />
 
@@ -502,7 +482,7 @@ export default function CTVApplyModal({
           )}
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         {!submitted && (
           <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0 bg-white sm:rounded-b-2xl">
             <button
