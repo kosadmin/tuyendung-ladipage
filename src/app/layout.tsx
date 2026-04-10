@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Việc làm tốt nhất | K-Outsourcing',
     description: 'Hàng trăm cơ hội việc làm thu nhập hấp dẫn đang chờ bạn.',
-    images: [{ url: '/banners/pc-1.png', width: 1200, height: 630 }],
+    images: [{ url: '/banners/mobile-1.png', width: 1200, height: 630 }],
     locale: 'vi_VN',
     type: 'website',
   },
