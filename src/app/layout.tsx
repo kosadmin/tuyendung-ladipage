@@ -10,8 +10,8 @@ export const metadata: Metadata = {
     'Khám phá hàng trăm việc làm thu nhập cao tại K-Outsourcing. Kết nối trực tiếp với doanh nghiệp uy tín, hỗ trợ ứng viên tận tình, hoàn toàn miễn phí.',
   keywords: 'việc làm, tuyển dụng, tìm việc, K-Outsourcing, nhân sự, lao động, công nhân',
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: '/logo-kos.png',
+    apple: '/logo-kos.png',
   },
   openGraph: {
     title: 'Việc làm tốt nhất | K-Outsourcing',
