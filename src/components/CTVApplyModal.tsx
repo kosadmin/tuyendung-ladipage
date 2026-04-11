@@ -56,6 +56,8 @@ interface FormData {
   company: string;
   position: string;
   interview_date: string;
+  experience_summary: string;  // ← thêm
+  tags: string;
 }
 
 interface FormErrors {
@@ -156,6 +158,8 @@ export default function CTVApplyModal({
     company,
     position: positions.length === 1 ? positions[0] : '',
     interview_date: '',
+    experience_summary: '',  // ← thêm
+    tags: '',
   });
 
   const [form, setForm]         = useState<FormData>(makeEmpty);
@@ -190,7 +194,7 @@ export default function CTVApplyModal({
   if (!open) return null;
 
   const set = (field: keyof FormData) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       setForm(f => ({ ...f, [field]: e.target.value }));
       setErrors(prev => ({ ...prev, [field]: undefined }));
     };
@@ -244,6 +248,8 @@ export default function CTVApplyModal({
       project:                 projectName,
       project_type:            projectType,
       interview_date:          form.interview_date,
+      experience_summary:      form.experience_summary.trim(),  // ← thêm
+      tags:                    form.tags,
       take_note:               '',
       assigned_user:           assignmentOverride.assigned_user,
       assigned_user_name:      assignmentOverride.assigned_user_name,
@@ -432,6 +438,17 @@ export default function CTVApplyModal({
                   {EDUCATION_LEVELS.map(e => <option key={e} value={e}>{e}</option>)}
                 </select>
               </div>
+              {/* Kinh nghiệm làm việc — đặt sau select Trình độ, trước Section Vị trí */}
+              <div>
+                <Label>Kinh nghiệm làm việc</Label>
+                <textarea
+                  value={form.experience_summary}
+                  onChange={set('experience_summary')}
+                  placeholder="VD: 2 năm may công nghiệp tại Hà Nam, quen làm ca..."
+                  rows={3}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-[13px] text-gray-800 bg-white outline-none transition resize-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 hover:border-gray-300"
+                />
+              </div>
 
               {/* 5. Vị trí ứng tuyển */}
               <SectionTitle>Vị trí ứng tuyển</SectionTitle>
@@ -472,6 +489,32 @@ export default function CTVApplyModal({
                 value={form.interview_date} onChange={set('interview_date')}
                 min={today}
               />
+              <div>
+                <Label>Hình thức phỏng vấn</Label>
+                <div className="flex gap-3">
+                  {['Online', 'Trực tiếp'].map(option => (
+                    <label
+                      key={option}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer text-[13px] font-bold transition-all
+                        ${form.tags === option
+                          ? 'border-orange-400 bg-orange-50 text-orange-700'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                    >
+                      <input
+                        type="radio"
+                        name="tags"
+                        value={option}
+                        checked={form.tags === option}
+                        onChange={set('tags')}
+                        className="sr-only"
+                      />
+                      <span>{option === 'Online' ? '💻' : '🏢'}</span>
+                      {option}
+                    </label>
+                  ))}
+                </div>
+              </div>
 
               {submitErr && (
                 <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-[12px] text-red-600 font-medium">
