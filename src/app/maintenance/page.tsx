@@ -85,7 +85,7 @@ export default function MaintenancePage() {
         {/* Message */}
         <p style={{ fontSize: 14, lineHeight: 1.75, color: '#7a726a' }}>
           Chúng tôi đang thực hiện nâng cấp và chuyển đổi hệ thống để mang đến trải nghiệm tốt hơn.
-          Vui lòng liên hệ <strong style={{ color: '#3a3330', fontWeight: 600 }}>Bộ phận Chăm sóc CTV của KOS</strong> để được hỗ trợ.
+          Vui lòng liên hệ <strong style={{ color: '#3a3330', fontWeight: 600 }}>Bộ phận Chăm sóc CTV của KOS (0979.112.718)</strong> để được hỗ trợ.
         </p>
 
         {/* Footer */}
