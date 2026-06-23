@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // ── Bật/tắt chế độ bảo trì tại đây ───────────────────────────────────────
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 // ─────────────────────────────────────────────────────────────────────────
 
 export function middleware(request: NextRequest) {
